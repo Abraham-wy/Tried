@@ -2053,7 +2053,7 @@
   (function initRouteMaps() {
     if (typeof L === 'undefined') return;
 
-    // 高德地图瓦片 (Gaode/Amap tile data source)
+    // 高德地图瓦片 (Gaode/Amap tile data source) — style=7: 标准地图（含道路+标注）
     const AMAP_URL = 'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}';
     const AMAP_OPTS = {
       subdomains: ['1','2','3','4'],
@@ -2210,7 +2210,7 @@
     });
 
     // Fullscreen buttons
-    const noop = () => {};
+    const noopHandler = () => {};
     [1, 2, 3].forEach(day => {
       const btn = document.getElementById('mapFullBtn' + day);
       if (btn) btn.addEventListener('click', () => {
@@ -2219,7 +2219,7 @@
         if (document.fullscreenElement) {
           document.exitFullscreen();
         } else {
-          (panel.requestFullscreen || panel.webkitRequestFullscreen || panel.mozRequestFullScreen || noop).call(panel);
+          (panel.requestFullscreen || panel.webkitRequestFullscreen || panel.mozRequestFullScreen || noopHandler).call(panel);
         }
       });
     });
