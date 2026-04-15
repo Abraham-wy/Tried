@@ -808,6 +808,26 @@
       white-space: nowrap;
     }
     .leaflet-tooltip.map-tip::before { display: none; }
+    /* ─── Stop annotation tooltips (permanent, slide-in) ─── */
+    .leaflet-tooltip.map-anno {
+      background: rgba(4,9,26,0.93);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 10px;
+      padding: 6px 12px 7px 10px;
+      box-shadow: 0 4px 22px rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.42s ease, transform 0.44s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .leaflet-tooltip.map-anno.leaflet-tooltip-right { transform: translateX(-18px) scale(0.82); }
+    .leaflet-tooltip.map-anno.leaflet-tooltip-left  { transform: translateX(18px)  scale(0.82); }
+    .leaflet-tooltip.map-anno.anno-visible { opacity: 1 !important; transform: none !important; }
+    .leaflet-tooltip.map-anno::before { display: none !important; }
+    .anno-num  { font-size: 10px; font-weight: 700; margin-right: 4px; opacity: 0.9; }
+    .anno-name { font-size: 12px; font-weight: 600; }
+    .anno-sub  { font-size: 11px; color: #86868b; display: block; margin-top: 1px; }
     /* Fullscreen panel expansion */
     .map-panel:fullscreen .amap-container,
     .map-panel:-webkit-full-screen .amap-container { height: calc(100vh - 60px); }
@@ -2116,12 +2136,11 @@
   })();
 
   // ══════════════════════════════════════
-  // LEAFLET + 高德地图 INTERACTIVE MAPS (with sequential route animation)
+  // LEAFLET + 高德地图 INTERACTIVE MAPS (sequential route animation + stop annotations)
   // ══════════════════════════════════════
   (function initRouteMaps() {
     if (typeof L === 'undefined') return;
 
-    // 高德地图瓦片 (Gaode/Amap tile data source) — style=7: 标准地图（含道路+标注）
     const AMAP_URL = 'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}';
     const AMAP_OPTS = {
       subdomains: ['1','2','3','4'],
@@ -2129,7 +2148,6 @@
       attribution: '© <a href="https://amap.com" target="_blank" rel="noopener">高德地图</a>',
     };
 
-    // Per-day configurations
     const DAYS = [
       {
         id: 1,
@@ -2156,7 +2174,7 @@
         id: 2,
         stops: [
           { name:'Ekkamai 巴士站',        sub:'07:00 乘大巴出发',    lat:13.7198, lng:100.5873, col:'#0071e3' },
-          { name:'芭提雅 Bali Hai 码头', sub:'09:00 抵达',           lat:12.9269, lng:100.8786, col:'#30d158' },
+          { name:'芭提雅 Bali Hai 码头',  sub:'09:00 抵达',          lat:12.9269, lng:100.8786, col:'#30d158' },
           { name:'珊瑚岛 Koh Larn',       sub:'10:00 白沙滩 · 浮潜', lat:12.9091, lng:100.7741, col:'#5ac8fa' },
           { name:'芭提雅海滩',            sub:'16:00 落日散步',       lat:12.9347, lng:100.8824, col:'#ffd60a' },
           { name:'返回曼谷',              sub:'18:30 大巴',           lat:13.7198, lng:100.5873, col:'#0071e3' },
@@ -2192,7 +2210,7 @@
 
     const leafletMaps = {};
     const mapBounds = {};
-    const mapPlays = {};  // dayId → playAnimation fn
+    const mapPlays = {};
 
     function initMap(dayId) {
       const el = document.getElementById('amap-day' + dayId);
@@ -2204,50 +2222,65 @@
       L.control.zoom({ position: 'topright' }).addTo(lmap);
       L.tileLayer(AMAP_URL, AMAP_OPTS).addTo(lmap);
 
-      // Route polylines — start with opacity 0 (will be drawn by animation)
+      // Route polylines — invisible until drawn by animation
       const polylineLayers = cfg.segs.map(seg => {
         const a = cfg.stops[seg.p[0]], b = cfg.stops[seg.p[1]];
         return L.polyline([[a.lat, a.lng], [b.lat, b.lng]], {
-          color: seg.col, weight: 3.5, opacity: 0,
+          color: seg.col, weight: 4, opacity: 0,
           dashArray: seg.dash || null,
         }).addTo(lmap);
       });
 
-      // Markers with tooltips — start hidden
+      // Dot markers — invisible until shown by animation
       const markerLayers = cfg.stops.map(stop => {
         const icon = L.divIcon({
           className: '',
           html: `<div style="
             width:13px;height:13px;border-radius:50%;
-            background:${stop.col};border:2px solid rgba(255,255,255,0.85);
-            box-shadow:0 0 12px ${stop.col}99;
+            background:${stop.col};border:2.5px solid rgba(255,255,255,0.9);
+            box-shadow:0 0 14px ${stop.col}aa;
             opacity:0;transform:scale(0.3);
-            transition:opacity 0.4s ease,transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+            transition:opacity 0.38s ease,transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
           "></div>`,
           iconSize: [13, 13], iconAnchor: [6, 6],
         });
-        return L.marker([stop.lat, stop.lng], { icon })
-          .bindTooltip(
-            `<strong style="color:${stop.col}">${stop.name}</strong>` +
-            `<br><span style="color:#86868b;font-size:11px">${stop.sub}</span>`,
-            { permanent: false, direction: 'top', offset: [0, -9], className: 'map-tip' }
-          )
-          .addTo(lmap);
+        return L.marker([stop.lat, stop.lng], { icon }).addTo(lmap);
       });
 
+      // Precompute annotation direction: stops left of map center → annotation right, and vice versa
+      const center = L.latLngBounds(cfg.stops.map(s => [s.lat, s.lng])).getCenter();
+
+      // Permanent annotation tooltips (not added to map until animated in)
+      const annoLayers = cfg.stops.map((stop, i) => {
+        const dir = stop.lng < center.lng ? 'right' : 'left';
+        return L.tooltip({
+          permanent: true,
+          direction: dir,
+          className: 'map-anno',
+          offset: [dir === 'right' ? 20 : -20, 0],
+        })
+        .setContent(
+          `<span class="anno-num" style="color:${stop.col}">⬤ ${i + 1}</span>` +
+          `<span class="anno-name" style="color:${stop.col}">${stop.name}</span>` +
+          `<span class="anno-sub">${stop.sub}</span>`
+        )
+        .setLatLng([stop.lat, stop.lng]);
+      });
+
+      // Fit bounds, then zoom out 2 levels for a wider initial overview
       const bounds = L.latLngBounds(cfg.stops.map(s => [s.lat, s.lng]));
-      // Fit bounds, then zoom out one level for a wider initial view
-      lmap.fitBounds(bounds, { padding: [50, 50] });
+      lmap.fitBounds(bounds, { padding: [55, 55] });
       lmap.once('moveend', () => {
-        const z = lmap.getZoom();
-        lmap.setZoom(Math.max(z - 1, 5), { animate: false });
+        lmap.setZoom(Math.max(lmap.getZoom() - 2, 5), { animate: false });
       });
       mapBounds[dayId] = bounds;
       leafletMaps[dayId] = lmap;
 
-      // ── Sequential animation ──
+      // ── Sequential animation: departure → draw line → arrival annotation → repeat ──
       function playAnimation() {
-        // 1. Reset all polylines (hide + remove dashoffset)
+        const shownStops = new Set();
+
+        // Reset polylines
         polylineLayers.forEach(pl => {
           const p = pl._path;
           if (!p) return;
@@ -2256,7 +2289,8 @@
           p.style.strokeDasharray = '';
           p.style.strokeDashoffset = '';
         });
-        // 2. Reset all marker icons
+
+        // Reset marker dots (instant, no transition)
         markerLayers.forEach(ml => {
           const icon = ml._icon;
           if (!icon) return;
@@ -2267,49 +2301,84 @@
           dot.style.transform = 'scale(0.3)';
         });
 
-        const STAGGER = 210; // ms between each marker pop-in
-        const MARKER_TOTAL = cfg.stops.length * STAGGER + 350;
+        // Remove existing annotations and clear their visible class
+        annoLayers.forEach(al => {
+          if (al._map) lmap.removeLayer(al);
+          if (al._container) al._container.classList.remove('anno-visible');
+        });
 
-        // 3. Animate markers in order with staggered pop-in
-        cfg.stops.forEach((_, i) => {
-          setTimeout(() => {
-            const icon = markerLayers[i]._icon;
-            if (!icon) return;
+        // Show a stop's dot + annotation at the given index
+        function showStop(idx) {
+          if (shownStops.has(idx)) return;
+          shownStops.add(idx);
+
+          // Animate dot marker in
+          const icon = markerLayers[idx] && markerLayers[idx]._icon;
+          if (icon) {
             const dot = icon.firstElementChild;
-            if (!dot) return;
-            dot.style.transition = 'opacity 0.38s ease, transform 0.45s cubic-bezier(0.34,1.56,0.64,1)';
-            dot.style.opacity = '1';
-            dot.style.transform = 'scale(1)';
-          }, 300 + i * STAGGER);
-        });
+            if (dot) {
+              dot.style.transition = 'opacity 0.38s ease, transform 0.45s cubic-bezier(0.34,1.56,0.64,1)';
+              dot.style.opacity = '1';
+              dot.style.transform = 'scale(1)';
+            }
+          }
 
-        // 4. Animate route segments in order after markers are all shown
-        let segDelay = MARKER_TOTAL;
-        cfg.segs.forEach((seg, i) => {
-          const dur = seg.dur || 700;
-          const pl = polylineLayers[i];
-          setTimeout(() => {
-            const p = pl._path;
-            if (!p) return;
-            const len = p.getTotalLength();
-            // Reset dashoffset synchronously
-            p.style.transition = 'none';
-            p.style.opacity = '0.92';
-            p.style.strokeDasharray = String(len);
-            p.style.strokeDashoffset = String(len);
-            // Force reflow, then animate
-            requestAnimationFrame(() => requestAnimationFrame(() => {
-              p.style.transition = `stroke-dashoffset ${dur}ms cubic-bezier(0.4,0,0.2,1)`;
-              p.style.strokeDashoffset = '0';
-            }));
-          }, segDelay);
-          segDelay += dur + 120; // small gap between consecutive segments
-        });
+          // Add annotation tooltip to map, then trigger slide-in
+          const al = annoLayers[idx];
+          if (al) {
+            al.addTo(lmap);
+            requestAnimationFrame(() => {
+              if (al._container) al._container.classList.add('anno-visible');
+            });
+          }
+        }
+
+        // Draw one segment (stroke-dashoffset draw effect), then call onDone
+        function drawSegment(segIdx, onDone) {
+          const seg = cfg.segs[segIdx];
+          const pl = polylineLayers[segIdx];
+          const svgP = pl && pl._path;
+          if (!svgP) { onDone && onDone(); return; }
+
+          const len = svgP.getTotalLength();
+          if (len === 0) {
+            svgP.style.opacity = '0.92';
+            onDone && onDone();
+            return;
+          }
+
+          svgP.style.transition = 'none';
+          svgP.style.opacity = '0.92';
+          svgP.style.strokeDasharray = String(len);
+          svgP.style.strokeDashoffset = String(len);
+
+          // Double rAF to flush style changes before starting transition
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            svgP.style.transition = `stroke-dashoffset ${seg.dur}ms cubic-bezier(0.4,0,0.2,1)`;
+            svgP.style.strokeDashoffset = '0';
+            setTimeout(() => onDone && onDone(), seg.dur);
+          }));
+        }
+
+        // Recursive chain: draw segment → reveal arrival stop → draw next segment…
+        function chain(segIdx) {
+          if (segIdx >= cfg.segs.length) return;
+          drawSegment(segIdx, () => {
+            showStop(cfg.segs[segIdx].p[1]);
+            setTimeout(() => chain(segIdx + 1), 280);
+          });
+        }
+
+        // Kick off: show starting stop, brief pause, then run chain
+        setTimeout(() => {
+          showStop(cfg.segs[0].p[0]);
+          setTimeout(() => chain(0), 420);
+        }, 400);
       }
 
       mapPlays[dayId] = playAnimation;
-      // Auto-play once tiles have a moment to load
-      setTimeout(playAnimation, 600);
+      // Auto-play once the map tiles have settled
+      setTimeout(playAnimation, 950);
     }
 
     // Initialize Day 1 when section scrolls into view
@@ -2340,14 +2409,14 @@
           } else {
             setTimeout(() => {
               leafletMaps[day].invalidateSize();
-              leafletMaps[day].fitBounds(mapBounds[day], { padding: [50, 50] });
+              leafletMaps[day].fitBounds(mapBounds[day], { padding: [55, 55] });
             }, 80);
           }
         }
       });
     });
 
-    // Replay buttons — replay the sequential animation
+    // Replay buttons — restart full animation sequence
     [1, 2, 3].forEach(day => {
       const btn = document.getElementById('mapReplayBtn' + day);
       if (btn) btn.addEventListener('click', () => {
