@@ -638,6 +638,51 @@
       transform: none;
     }
 
+    /* ─── Extra scroll-reveal variants for visual variety ─── */
+    .rv-bounce {
+      opacity: 0;
+      transform: scale(0.78) translateY(24px);
+      transition: opacity 0.55s cubic-bezier(0.34,1.56,0.64,1), transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .rv-bounce.visible { opacity: 1; transform: none; }
+
+    .rv-blur {
+      opacity: 0;
+      transform: translateY(22px);
+      filter: blur(8px);
+      transition: opacity 0.7s var(--transition), transform 0.7s var(--transition), filter 0.65s var(--transition);
+    }
+    .rv-blur.visible { opacity: 1; transform: none; filter: blur(0); }
+
+    .rv-perspective {
+      opacity: 0;
+      transform: perspective(580px) rotateX(18deg) translateY(28px);
+      transition: opacity 0.72s var(--transition), transform 0.72s var(--transition);
+    }
+    .rv-perspective.visible { opacity: 1; transform: none; }
+
+    .rv-twist {
+      opacity: 0;
+      transform: rotate(-4deg) translateX(-24px);
+      transform-origin: center left;
+      transition: opacity 0.62s cubic-bezier(0.34,1.42,0.64,1), transform 0.62s cubic-bezier(0.34,1.42,0.64,1);
+    }
+    .rv-twist.visible { opacity: 1; transform: none; }
+
+    .rv-zoom-in {
+      opacity: 0;
+      transform: scale(1.12);
+      transition: opacity 0.65s var(--transition), transform 0.65s var(--transition);
+    }
+    .rv-zoom-in.visible { opacity: 1; transform: none; }
+
+    .rv-slide-far {
+      opacity: 0;
+      transform: translateY(70px);
+      transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1), transform 0.9s cubic-bezier(0.22,1,0.36,1);
+    }
+    .rv-slide-far.visible { opacity: 1; transform: none; }
+
     /* ─── Float animation for hero stats ─── */
     @keyframes float {
       0%, 100% { transform: translateY(0); }
@@ -946,7 +991,7 @@
           <span class="leg-item"><span class="leg-line leg-line-solid" style="--c:#30d158"></span>步行景点</span>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <button class="open-btn" id="mapReplayBtn1">📍 重置视图</button>
+          <button class="open-btn" id="mapReplayBtn1">▶ 重播路线</button>
           <button class="fullscreen-btn" id="mapFullBtn1">⛶ 全屏</button>
         </div>
       </div>
@@ -964,7 +1009,7 @@
           <span class="leg-item"><span class="leg-line leg-line-dot" style="--c:#0071e3"></span>Grab</span>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <button class="open-btn" id="mapReplayBtn2">📍 重置视图</button>
+          <button class="open-btn" id="mapReplayBtn2">▶ 重播路线</button>
           <button class="fullscreen-btn" id="mapFullBtn2">⛶ 全屏</button>
         </div>
       </div>
@@ -981,7 +1026,7 @@
           <span class="leg-item"><span class="leg-line leg-line-solid" style="--c:#ffd60a"></span>🎤 演唱会</span>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <button class="open-btn" id="mapReplayBtn3">📍 重置视图</button>
+          <button class="open-btn" id="mapReplayBtn3">▶ 重播路线</button>
           <button class="fullscreen-btn" id="mapFullBtn3">⛶ 全屏</button>
         </div>
       </div>
@@ -1925,8 +1970,31 @@
   window.addEventListener('scroll', updateActive, { passive: true });
   updateActive();
 
+  // ── Diversify reveal animations (run before observer) ──
+  const REVEAL_POOL = [
+    'reveal-left', 'rv-bounce', 'rv-blur', 'rv-perspective',
+    'reveal-right', 'rv-twist', 'rv-zoom-in', 'rv-slide-far', 'reveal-scale',
+  ];
+  let _rvIdx = 0;
+  document.querySelectorAll('.reveal').forEach(el => {
+    // Keep structural text elements uniform (fade-up)
+    if (
+      el.classList.contains('section-title') ||
+      el.classList.contains('section-label') ||
+      el.classList.contains('section-desc') ||
+      el.classList.contains('hero-wrapper') ||
+      el.tagName === 'SECTION'
+    ) return;
+    const variant = REVEAL_POOL[_rvIdx++ % REVEAL_POOL.length];
+    el.classList.remove('reveal');
+    el.classList.add(variant);
+  });
+
   // ── Scroll-triggered reveal (all variants) ──
-  const allReveal = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+  const allReveal = document.querySelectorAll(
+    '.reveal, .reveal-left, .reveal-right, .reveal-scale,' +
+    '.rv-bounce, .rv-blur, .rv-perspective, .rv-twist, .rv-zoom-in, .rv-slide-far'
+  );
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -2048,7 +2116,7 @@
   })();
 
   // ══════════════════════════════════════
-  // LEAFLET + 高德地图 INTERACTIVE MAPS
+  // LEAFLET + 高德地图 INTERACTIVE MAPS (with sequential route animation)
   // ══════════════════════════════════════
   (function initRouteMaps() {
     if (typeof L === 'undefined') return;
@@ -2075,13 +2143,13 @@
           { name:'Vertigo Rooftop Bar',  sub:'20:30 360° 夜景',     lat:13.7219, lng:100.5316, col:'#ff453a' },
         ],
         segs: [
-          { p:[0,1], col:'#5ac8fa', dash:'8 5' },
-          { p:[1,2], col:'#30d158' },
-          { p:[2,3], col:'#30d158' },
-          { p:[3,4], col:'#bf5af2' },
-          { p:[4,5], col:'#ffd60a' },
-          { p:[5,6], col:'#ff453a' },
-          { p:[6,1], col:'#5ac8fa', dash:'4 4' },
+          { p:[0,1], col:'#5ac8fa', dash:'8 5', dur:1100 },
+          { p:[1,2], col:'#30d158', dur:650 },
+          { p:[2,3], col:'#30d158', dur:600 },
+          { p:[3,4], col:'#bf5af2', dur:620 },
+          { p:[4,5], col:'#ffd60a', dur:700 },
+          { p:[5,6], col:'#ff453a', dur:660 },
+          { p:[6,1], col:'#5ac8fa', dash:'4 4', dur:720 },
         ],
       },
       {
@@ -2094,11 +2162,11 @@
           { name:'返回曼谷',              sub:'18:30 大巴',           lat:13.7198, lng:100.5873, col:'#0071e3' },
         ],
         segs: [
-          { p:[0,1], col:'#30d158' },
-          { p:[1,2], col:'#5ac8fa', dash:'8 5' },
-          { p:[2,3], col:'#5ac8fa', dash:'8 5' },
-          { p:[3,1], col:'#30d158' },
-          { p:[1,4], col:'#30d158' },
+          { p:[0,1], col:'#30d158', dur:1400 },
+          { p:[1,2], col:'#5ac8fa', dash:'8 5', dur:750 },
+          { p:[2,3], col:'#5ac8fa', dash:'8 5', dur:720 },
+          { p:[3,1], col:'#30d158', dur:700 },
+          { p:[1,4], col:'#30d158', dur:1350 },
         ],
       },
       {
@@ -2112,18 +2180,19 @@
           { name:'返回酒店',            sub:'演出结束 BTS/Grab',        lat:13.7401, lng:100.5641, col:'#30d158' },
         ],
         segs: [
-          { p:[0,1], col:'#bf5af2' },
-          { p:[1,2], col:'#5ac8fa' },
-          { p:[2,3], col:'#bf5af2', dash:'5 4' },
-          { p:[3,0], col:'#bf5af2' },
-          { p:[0,4], col:'#ffd60a', dash:'5 4' },
-          { p:[4,5], col:'#ffd60a', dash:'5 4' },
+          { p:[0,1], col:'#bf5af2', dur:680 },
+          { p:[1,2], col:'#5ac8fa', dur:300 },
+          { p:[2,3], col:'#bf5af2', dash:'5 4', dur:620 },
+          { p:[3,0], col:'#bf5af2', dur:650 },
+          { p:[0,4], col:'#ffd60a', dash:'5 4', dur:950 },
+          { p:[4,5], col:'#ffd60a', dash:'5 4', dur:950 },
         ],
       },
     ];
 
     const leafletMaps = {};
     const mapBounds = {};
+    const mapPlays = {};  // dayId → playAnimation fn
 
     function initMap(dayId) {
       const el = document.getElementById('amap-day' + dayId);
@@ -2135,33 +2204,112 @@
       L.control.zoom({ position: 'topright' }).addTo(lmap);
       L.tileLayer(AMAP_URL, AMAP_OPTS).addTo(lmap);
 
-      // Route polylines
-      cfg.segs.forEach(seg => {
+      // Route polylines — start with opacity 0 (will be drawn by animation)
+      const polylineLayers = cfg.segs.map(seg => {
         const a = cfg.stops[seg.p[0]], b = cfg.stops[seg.p[1]];
-        L.polyline([[a.lat, a.lng], [b.lat, b.lng]], {
-          color: seg.col, weight: 3.5, opacity: 0.9,
+        return L.polyline([[a.lat, a.lng], [b.lat, b.lng]], {
+          color: seg.col, weight: 3.5, opacity: 0,
           dashArray: seg.dash || null,
         }).addTo(lmap);
       });
 
-      // Markers with tooltips
-      cfg.stops.forEach(stop => {
+      // Markers with tooltips — start hidden
+      const markerLayers = cfg.stops.map(stop => {
         const icon = L.divIcon({
           className: '',
-          html: `<div style="width:12px;height:12px;border-radius:50%;background:${stop.col};border:2px solid rgba(255,255,255,0.85);box-shadow:0 0 10px ${stop.col}88;"></div>`,
-          iconSize: [12, 12], iconAnchor: [6, 6],
+          html: `<div style="
+            width:13px;height:13px;border-radius:50%;
+            background:${stop.col};border:2px solid rgba(255,255,255,0.85);
+            box-shadow:0 0 12px ${stop.col}99;
+            opacity:0;transform:scale(0.3);
+            transition:opacity 0.4s ease,transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+          "></div>`,
+          iconSize: [13, 13], iconAnchor: [6, 6],
         });
-        L.marker([stop.lat, stop.lng], { icon })
-          .bindTooltip(`<strong style="color:${stop.col}">${stop.name}</strong><br><span style="color:#86868b;font-size:11px">${stop.sub}</span>`, {
-            permanent: false, direction: 'top', offset: [0, -8], className: 'map-tip',
-          })
+        return L.marker([stop.lat, stop.lng], { icon })
+          .bindTooltip(
+            `<strong style="color:${stop.col}">${stop.name}</strong>` +
+            `<br><span style="color:#86868b;font-size:11px">${stop.sub}</span>`,
+            { permanent: false, direction: 'top', offset: [0, -9], className: 'map-tip' }
+          )
           .addTo(lmap);
       });
 
       const bounds = L.latLngBounds(cfg.stops.map(s => [s.lat, s.lng]));
-      lmap.fitBounds(bounds, { padding: [45, 45] });
+      // Fit bounds, then zoom out one level for a wider initial view
+      lmap.fitBounds(bounds, { padding: [50, 50] });
+      lmap.once('moveend', () => {
+        const z = lmap.getZoom();
+        lmap.setZoom(Math.max(z - 1, 5), { animate: false });
+      });
       mapBounds[dayId] = bounds;
       leafletMaps[dayId] = lmap;
+
+      // ── Sequential animation ──
+      function playAnimation() {
+        // 1. Reset all polylines (hide + remove dashoffset)
+        polylineLayers.forEach(pl => {
+          const p = pl._path;
+          if (!p) return;
+          p.style.transition = 'none';
+          p.style.opacity = '0';
+          p.style.strokeDasharray = '';
+          p.style.strokeDashoffset = '';
+        });
+        // 2. Reset all marker icons
+        markerLayers.forEach(ml => {
+          const icon = ml._icon;
+          if (!icon) return;
+          const dot = icon.firstElementChild;
+          if (!dot) return;
+          dot.style.transition = 'none';
+          dot.style.opacity = '0';
+          dot.style.transform = 'scale(0.3)';
+        });
+
+        const STAGGER = 210; // ms between each marker pop-in
+        const MARKER_TOTAL = cfg.stops.length * STAGGER + 350;
+
+        // 3. Animate markers in order with staggered pop-in
+        cfg.stops.forEach((_, i) => {
+          setTimeout(() => {
+            const icon = markerLayers[i]._icon;
+            if (!icon) return;
+            const dot = icon.firstElementChild;
+            if (!dot) return;
+            dot.style.transition = 'opacity 0.38s ease, transform 0.45s cubic-bezier(0.34,1.56,0.64,1)';
+            dot.style.opacity = '1';
+            dot.style.transform = 'scale(1)';
+          }, 300 + i * STAGGER);
+        });
+
+        // 4. Animate route segments in order after markers are all shown
+        let segDelay = MARKER_TOTAL;
+        cfg.segs.forEach((seg, i) => {
+          const dur = seg.dur || 700;
+          const pl = polylineLayers[i];
+          setTimeout(() => {
+            const p = pl._path;
+            if (!p) return;
+            const len = p.getTotalLength();
+            // Reset dashoffset synchronously
+            p.style.transition = 'none';
+            p.style.opacity = '0.92';
+            p.style.strokeDasharray = String(len);
+            p.style.strokeDashoffset = String(len);
+            // Force reflow, then animate
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+              p.style.transition = `stroke-dashoffset ${dur}ms cubic-bezier(0.4,0,0.2,1)`;
+              p.style.strokeDashoffset = '0';
+            }));
+          }, segDelay);
+          segDelay += dur + 120; // small gap between consecutive segments
+        });
+      }
+
+      mapPlays[dayId] = playAnimation;
+      // Auto-play once tiles have a moment to load
+      setTimeout(playAnimation, 600);
     }
 
     // Initialize Day 1 when section scrolls into view
@@ -2192,20 +2340,18 @@
           } else {
             setTimeout(() => {
               leafletMaps[day].invalidateSize();
-              leafletMaps[day].fitBounds(mapBounds[day], { padding: [45, 45] });
+              leafletMaps[day].fitBounds(mapBounds[day], { padding: [50, 50] });
             }, 80);
           }
         }
       });
     });
 
-    // Reset-view buttons
+    // Replay buttons — replay the sequential animation
     [1, 2, 3].forEach(day => {
       const btn = document.getElementById('mapReplayBtn' + day);
       if (btn) btn.addEventListener('click', () => {
-        if (leafletMaps[day] && mapBounds[day]) {
-          leafletMaps[day].fitBounds(mapBounds[day], { padding: [45, 45], animate: true, duration: 0.6 });
-        }
+        if (mapPlays[day]) mapPlays[day]();
       });
     });
 
