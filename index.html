@@ -577,6 +577,134 @@
     }
     footer strong { color: var(--text); }
 
+    /* ─── Scroll progress bar ─── */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--teal));
+      z-index: 1000;
+      transition: width 0.1s linear;
+      border-radius: 0 2px 2px 0;
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    /* ─── External link styling ─── */
+    .ext-link {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      transition: color 0.25s, border-color 0.25s;
+      cursor: pointer;
+    }
+    .ext-link:hover {
+      color: #5ac8fa;
+      border-color: #5ac8fa;
+    }
+    .ext-link-card {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+    }
+    .ext-link-card:hover .info-card,
+    .ext-link-card:hover .food-card,
+    .ext-link-card:hover .day-card {
+      border-color: rgba(90,200,250,0.4);
+      box-shadow: 0 0 20px rgba(90,200,250,0.15), 0 16px 40px rgba(0,0,0,0.4);
+    }
+
+    /* ─── Reveal variants ─── */
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.7s var(--transition), transform 0.7s var(--transition);
+    }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.7s var(--transition), transform 0.7s var(--transition);
+    }
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.88);
+      transition: opacity 0.7s var(--transition), transform 0.7s var(--transition);
+    }
+    .reveal-left.visible,
+    .reveal-right.visible,
+    .reveal-scale.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ─── Float animation for hero stats ─── */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+    .hero-stat { animation: float 4s ease-in-out infinite; }
+    .hero-stat:nth-child(2) { animation-delay: 0.5s; }
+    .hero-stat:nth-child(3) { animation-delay: 1s; }
+    .hero-stat:nth-child(4) { animation-delay: 1.5s; }
+
+    /* ─── Particles in hero ─── */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+      animation: particle-rise linear infinite;
+    }
+    @keyframes particle-rise {
+      0%   { opacity: 0; transform: translateY(0) scale(0); }
+      10%  { opacity: 0.6; }
+      90%  { opacity: 0.4; }
+      100% { opacity: 0; transform: translateY(-120vh) scale(1.2); }
+    }
+
+    /* ─── Timeline dot pulse ─── */
+    .tl-dot {
+      animation: dot-pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes dot-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,113,227,0.4); }
+      50%       { box-shadow: 0 0 0 5px rgba(0,113,227,0); }
+    }
+
+    /* ─── Glow card hover ─── */
+    .info-card:hover {
+      border-color: rgba(90,200,250,0.35) !important;
+      box-shadow: 0 0 24px rgba(90,200,250,0.1), 0 16px 40px rgba(0,0,0,0.4);
+    }
+
+    /* ─── Count-up number style ─── */
+    .count-num { display: inline-block; }
+
+    /* ─── Book/open button ─── */
+    .open-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      padding: 9px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      text-decoration: none;
+      transition: background 0.3s, border-color 0.3s, transform 0.2s;
+      cursor: pointer;
+    }
+    .open-btn:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.35);
+      transform: translateY(-2px);
+      color: #fff;
+    }
+    .open-btn svg { flex-shrink: 0; }
+
     /* ─── Misc chips ─── */
     .chip {
       display: inline-flex;
@@ -595,6 +723,8 @@
   </style>
 </head>
 <body>
+
+<div id="progress-bar"></div>
 
 <!-- ══════════════════════════════════════
      NAVIGATION
@@ -617,6 +747,7 @@
 ══════════════════════════════════════ -->
 <section id="hero" style="padding-top: var(--nav-h)">
   <div class="hero-bg"></div>
+  <div id="particles"></div>
   <p class="hero-tag">2025 · 广州 → 曼谷 + 芭提雅</p>
   <h1 class="hero-title">泰国曼谷之旅<br>赵露思演唱会</h1>
   <p class="hero-sub">5月7日 – 10日 · 2人 · 性价比出行方案<br>白沙滩 · 珊瑚岛 · 河畔夜景 · 演唱会应援</p>
@@ -684,30 +815,30 @@
   <h3 class="reveal" style="font-size:20px;font-weight:600;margin:48px 0 20px;letter-spacing:-0.01em">
     Day 1 · 5月7日 — 抵达 &amp; 曼谷市区
   </h3>
-  <div class="timeline reveal">
-    <div class="tl-item">
+  <div class="timeline">
+    <div class="tl-item reveal-left">
       <div class="tl-dot"></div>
       <div class="tl-time">凌晨</div>
       <div class="tl-content">
-        <p class="tl-activity">✈️ 广州白云机场出发（提前2小时到机场）</p>
+        <p class="tl-activity">✈️ <a class="ext-link" href="https://www.baiyunairport.com" target="_blank" rel="noopener">广州白云机场 ↗</a>出发（提前2小时到机场）</p>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot"></div>
       <div class="tl-time">04:00–06:00</div>
       <div class="tl-content">
-        <p class="tl-activity">抵达曼谷廊曼机场（DMK）</p>
+        <p class="tl-activity">抵达<a class="ext-link" href="https://www.google.com/maps/search/Don+Mueang+International+Airport" target="_blank" rel="noopener">曼谷廊曼机场（DMK）↗</a></p>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-left">
       <div class="tl-dot"></div>
       <div class="tl-time">06:00–07:00</div>
       <div class="tl-content">
-        <p class="tl-activity">购买 AIS SIM卡 + 换泰铢 + 通关</p>
+        <p class="tl-activity">购买 <a class="ext-link" href="https://www.ais.th/traveler/" target="_blank" rel="noopener">AIS SIM卡 ↗</a> + 换泰铢 + 通关</p>
         <span class="tl-cost">SIM卡 100泰铢/人 ≈ ¥84（2人）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot"></div>
       <div class="tl-time">07:00–08:30</div>
       <div class="tl-content">
@@ -715,59 +846,59 @@
         <span class="tl-cost">约130泰铢 ≈ ¥55（2人）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-left">
       <div class="tl-dot"></div>
       <div class="tl-time">10:00–12:00</div>
       <div class="tl-content">
-        <p class="tl-activity">🌿 伦披尼公园（Lumphini Park）——湖景绿地，悠闲散步</p>
+        <p class="tl-activity">🌿 <a class="ext-link" href="https://www.google.com/maps/search/Lumphini+Park+Bangkok" target="_blank" rel="noopener">伦披尼公园（Lumphini Park）↗</a>——湖景绿地，悠闲散步</p>
         <span class="tl-cost free">免费</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot"></div>
       <div class="tl-time">12:00–13:30</div>
       <div class="tl-content">
-        <p class="tl-activity">🍜 午餐：暹罗区 MBK 美食广场</p>
+        <p class="tl-activity">🍜 午餐：<a class="ext-link" href="https://www.google.com/maps/search/MBK+Food+Island+Bangkok" target="_blank" rel="noopener">暹罗区 MBK 美食广场 ↗</a></p>
         <span class="tl-cost">约120泰铢/人 ≈ ¥102（2人）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-left">
       <div class="tl-dot"></div>
       <div class="tl-time">13:30–16:00</div>
       <div class="tl-content">
-        <p class="tl-activity">🛍️ 暹罗商圈（Siam Paragon / MBK）逛街</p>
+        <p class="tl-activity">🛍️ <a class="ext-link" href="https://www.google.com/maps/search/Siam+Paragon+Bangkok" target="_blank" rel="noopener">暹罗商圈（Siam Paragon / MBK）↗</a> 逛街</p>
         <span class="tl-cost free">按需消费</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot"></div>
       <div class="tl-time">16:00–17:30</div>
       <div class="tl-content">
-        <p class="tl-activity">🌇 Mahanakhon 天空栈道——78层玻璃地板，俯瞰全曼谷</p>
+        <p class="tl-activity">🌇 <a class="ext-link" href="https://www.kingpowermahanakhon.co.th" target="_blank" rel="noopener">Mahanakhon 天空栈道 ↗</a>——78层玻璃地板，俯瞰全曼谷</p>
         <span class="tl-cost">875泰铢/人 ≈ ¥372（2人）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-left">
       <div class="tl-dot"></div>
       <div class="tl-time">18:00–20:30</div>
       <div class="tl-content">
-        <p class="tl-activity">🌊 Asiatique 河畔夜市——湄南河夜景 + 摩天轮 + 美食</p>
+        <p class="tl-activity">🌊 <a class="ext-link" href="https://www.asiatiquethailand.com" target="_blank" rel="noopener">Asiatique 河畔夜市 ↗</a>——湄南河夜景 + 摩天轮 + 美食</p>
         <span class="tl-cost">免费入场，餐饮250泰铢/人 ≈ ¥212（2人）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot"></div>
       <div class="tl-time">20:30–22:00</div>
       <div class="tl-content">
-        <p class="tl-activity">🍹 Vertigo Rooftop Bar（Banyan Tree 顶层）——360° 夜景</p>
+        <p class="tl-activity">🍹 <a class="ext-link" href="https://www.banyantree.com/thailand/bangkok/vertigo-and-moon-bar" target="_blank" rel="noopener">Vertigo Rooftop Bar（Banyan Tree 顶层）↗</a>——360° 夜景</p>
         <span class="tl-cost">最低消费600泰铢/人 ≈ ¥255（2人合计）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-left">
       <div class="tl-dot"></div>
       <div class="tl-time">22:00</div>
       <div class="tl-content">
-        <p class="tl-activity">Grab 打车返回酒店休息</p>
+        <p class="tl-activity"><a class="ext-link" href="https://www.grab.com/th/" target="_blank" rel="noopener">Grab ↗</a> 打车返回酒店休息</p>
         <span class="tl-cost">约100泰铢 ≈ ¥42</span>
       </div>
     </div>
@@ -777,8 +908,8 @@
   <h3 class="reveal" style="font-size:20px;font-weight:600;margin:48px 0 20px;letter-spacing:-0.01em;color:#30d158">
     Day 2 · 5月8日 — 🏝️ 芭提雅 · 珊瑚岛
   </h3>
-  <div class="timeline reveal">
-    <div class="tl-item">
+  <div class="timeline">
+    <div class="tl-item reveal-left">
       <div class="tl-dot" style="border-color:#30d158"></div>
       <div class="tl-time">06:30–07:00</div>
       <div class="tl-content">
@@ -786,31 +917,31 @@
         <span class="tl-cost">约80泰铢/人 ≈ ¥68（2人）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot" style="border-color:#30d158"></div>
       <div class="tl-time">07:00–09:00</div>
       <div class="tl-content">
-        <p class="tl-activity">🚌 Ekkamai 长途巴士站乘大巴前往芭提雅</p>
+        <p class="tl-activity">🚌 <a class="ext-link" href="https://www.google.com/maps/search/Ekkamai+Bus+Terminal+Bangkok" target="_blank" rel="noopener">Ekkamai 长途巴士站 ↗</a>乘大巴前往芭提雅</p>
         <span class="tl-cost">131泰铢/人 ≈ ¥111（2人）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-left">
       <div class="tl-dot" style="border-color:#30d158"></div>
       <div class="tl-time">09:00–09:30</div>
       <div class="tl-content">
-        <p class="tl-activity">芭提雅市区转摩的 / 双条车→ Bali Hai Pier 码头</p>
+        <p class="tl-activity">芭提雅市区转摩的 / 双条车→ <a class="ext-link" href="https://www.google.com/maps/search/Bali+Hai+Pier+Pattaya" target="_blank" rel="noopener">Bali Hai Pier 码头 ↗</a></p>
         <span class="tl-cost">约100泰铢 ≈ ¥42（2人）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot" style="border-color:#30d158"></div>
       <div class="tl-time">09:30–10:00</div>
       <div class="tl-content">
-        <p class="tl-activity">🚢 渡轮前往珊瑚岛（Koh Larn）</p>
+        <p class="tl-activity">🚢 渡轮前往<a class="ext-link" href="https://www.google.com/maps/search/Koh+Larn+Pattaya" target="_blank" rel="noopener">珊瑚岛（Koh Larn）↗</a></p>
         <span class="tl-cost">30泰铢/人 ≈ ¥25（单程）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-left">
       <div class="tl-dot" style="border-color:#30d158"></div>
       <div class="tl-time">10:00–15:30</div>
       <div class="tl-content">
@@ -818,7 +949,7 @@
         <span class="tl-cost">浮潜装备¥64；午餐¥170/人；摩托艇可选¥255/人</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot" style="border-color:#30d158"></div>
       <div class="tl-time">15:30–16:00</div>
       <div class="tl-content">
@@ -826,23 +957,23 @@
         <span class="tl-cost">30泰铢/人 ≈ ¥25</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-left">
       <div class="tl-dot" style="border-color:#30d158"></div>
       <div class="tl-time">16:00–17:30</div>
       <div class="tl-content">
-        <p class="tl-activity">🌅 芭提雅海滩——落日余晖，沙滩漫步拍照</p>
+        <p class="tl-activity">🌅 <a class="ext-link" href="https://www.google.com/maps/search/Pattaya+Beach" target="_blank" rel="noopener">芭提雅海滩 ↗</a>——落日余晖，沙滩漫步拍照</p>
         <span class="tl-cost free">免费</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot" style="border-color:#30d158"></div>
       <div class="tl-time">17:30–18:30</div>
       <div class="tl-content">
-        <p class="tl-activity">🦞 芭提雅海鲜大排档晚餐——新鲜海鲜按斤计价</p>
+        <p class="tl-activity">🦞 <a class="ext-link" href="https://www.google.com/maps/search/Pattaya+Seafood+Restaurant" target="_blank" rel="noopener">芭提雅海鲜大排档晚餐 ↗</a>——新鲜海鲜按斤计价</p>
         <span class="tl-cost">约400泰铢/人 ≈ ¥340（2人）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-left">
       <div class="tl-dot" style="border-color:#30d158"></div>
       <div class="tl-time">18:30–20:30</div>
       <div class="tl-content">
@@ -850,11 +981,11 @@
         <span class="tl-cost">131泰铢/人 ≈ ¥111（2人）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot" style="border-color:#30d158"></div>
       <div class="tl-time">21:00</div>
       <div class="tl-content">
-        <p class="tl-activity">Grab 返回酒店，养精蓄锐备战演唱会</p>
+        <p class="tl-activity"><a class="ext-link" href="https://www.grab.com/th/" target="_blank" rel="noopener">Grab ↗</a> 返回酒店，养精蓄锐备战演唱会</p>
         <span class="tl-cost">约150泰铢 ≈ ¥64</span>
       </div>
     </div>
@@ -864,29 +995,29 @@
   <h3 class="reveal" style="font-size:20px;font-weight:600;margin:48px 0 20px;letter-spacing:-0.01em;color:#bf5af2">
     Day 3 · 5月9日 — 🎤 演唱会日
   </h3>
-  <div class="timeline reveal">
-    <div class="tl-item">
+  <div class="timeline">
+    <div class="tl-item reveal-left">
       <div class="tl-dot" style="border-color:#bf5af2"></div>
       <div class="tl-time">08:00–09:30</div>
       <div class="tl-content"><p class="tl-activity">酒店悠闲早餐</p></div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot" style="border-color:#bf5af2"></div>
       <div class="tl-time">10:00–12:30</div>
       <div class="tl-content">
-        <p class="tl-activity">🛍️ 恰图恰市集（Chatuchak Market）——5000+摊位</p>
+        <p class="tl-activity">🛍️ <a class="ext-link" href="https://www.google.com/maps/search/Chatuchak+Weekend+Market+Bangkok" target="_blank" rel="noopener">恰图恰市集（Chatuchak Market）↗</a>——5000+摊位</p>
         <span class="tl-cost free">免费入场，小食约¥84（2人）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-left">
       <div class="tl-dot" style="border-color:#bf5af2"></div>
       <div class="tl-time">12:30–13:30</div>
       <div class="tl-content">
-        <p class="tl-activity">🍜 午餐：Or Tor Kor 高档农贸市场</p>
+        <p class="tl-activity">🍜 午餐：<a class="ext-link" href="https://www.google.com/maps/search/Or+Tor+Kor+Market+Bangkok" target="_blank" rel="noopener">Or Tor Kor 高档农贸市场 ↗</a></p>
         <span class="tl-cost">约150泰铢/人 ≈ ¥127（2人）</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot" style="border-color:#bf5af2"></div>
       <div class="tl-time">13:30–15:30</div>
       <div class="tl-content">
@@ -894,31 +1025,31 @@
         <span class="tl-cost">咖啡¥84；纪念品按需</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-left">
       <div class="tl-dot" style="border-color:#bf5af2"></div>
       <div class="tl-time">15:30–17:00</div>
       <div class="tl-content"><p class="tl-activity">返回酒店换演唱会服装</p></div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot" style="border-color:#bf5af2"></div>
       <div class="tl-time">17:00–18:00</div>
       <div class="tl-content">
-        <p class="tl-activity">BTS / Grab 前往演唱会场馆</p>
+        <p class="tl-activity">BTS / <a class="ext-link" href="https://www.grab.com/th/" target="_blank" rel="noopener">Grab ↗</a> 前往演唱会场馆</p>
         <span class="tl-cost">约150泰铢 ≈ ¥64</span>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-left">
       <div class="tl-dot" style="border-color:#bf5af2"></div>
       <div class="tl-time">19:30 起</div>
       <div class="tl-content">
         <p class="tl-activity" style="color:#bf5af2;font-weight:700">🎤 赵露思演唱会！全场应援！</p>
       </div>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal-right">
       <div class="tl-dot" style="border-color:#bf5af2"></div>
       <div class="tl-time">演出结束</div>
       <div class="tl-content">
-        <p class="tl-activity">BTS（末班23:30）/ Grab 返回酒店</p>
+        <p class="tl-activity">BTS（末班23:30）/ <a class="ext-link" href="https://www.grab.com/th/" target="_blank" rel="noopener">Grab ↗</a> 返回酒店</p>
         <span class="tl-cost">约150泰铢 ≈ ¥64</span>
       </div>
     </div>
@@ -944,12 +1075,12 @@
     <div class="info-card reveal reveal-delay-2">
       <div class="info-card-icon">🛡️</div>
       <h3 class="info-card-title">旅行保险</h3>
-      <p class="info-card-body">推荐<strong>众安"全球无忧"</strong>或携程旅行险。3天综合险约 <strong style="color:#30d158">¥80/人</strong>，2人合计约¥160。<br><br>含境外医疗≥50万 · 航班延误 · 演唱会取消险</p>
+      <p class="info-card-body">推荐<a class="ext-link" href="https://www.zhongan.com" target="_blank" rel="noopener"><strong>众安"全球无忧" ↗</strong></a>或<a class="ext-link" href="https://vacations.ctrip.com/insurance/" target="_blank" rel="noopener">携程旅行险 ↗</a>。3天综合险约 <strong style="color:#30d158">¥80/人</strong>，2人合计约¥160。<br><br>含境外医疗≥50万 · 航班延误 · 演唱会取消险</p>
     </div>
     <div class="info-card reveal reveal-delay-3">
       <div class="info-card-icon">📱</div>
       <h3 class="info-card-title">通信 · AIS SIM</h3>
-      <p class="info-card-body">抵达廊曼机场即可在 <strong>AIS 专柜</strong>购买旅游SIM卡。<br><br>3天不限流量套餐：<strong style="color:#30d158">约100泰铢（¥21）/张</strong>，含语音通话，全国覆盖。</p>
+      <p class="info-card-body">抵达廊曼机场即可在 <a class="ext-link" href="https://www.ais.th/traveler/" target="_blank" rel="noopener"><strong>AIS 专柜 ↗</strong></a> 购买旅游SIM卡。<br><br>3天不限流量套餐：<strong style="color:#30d158">约100泰铢（¥21）/张</strong>，含语音通话，全国覆盖。</p>
     </div>
     <div class="info-card reveal reveal-delay-4">
       <div class="info-card-icon">💴</div>
@@ -1015,7 +1146,7 @@
   <div class="big-card reveal">
     <div>
       <p class="big-card-label">推荐航司</p>
-      <h3 class="big-card-name">亚洲航空<br>AirAsia</h3>
+      <h3 class="big-card-name"><a class="ext-link" href="https://www.airasia.com" target="_blank" rel="noopener">亚洲航空<br>AirAsia ↗</a></h3>
       <p class="big-card-desc">广州白云（CAN）⇄ 曼谷廊曼（DMK）直飞，提前1–2个月购票性价比最高。</p>
       <div style="margin-bottom:8px">
         <div class="price-badge">
@@ -1045,7 +1176,11 @@
       </div>
       <div class="kv-item">
         <span class="kv-key">购票渠道</span>
-        <span class="kv-val">AirAsia官网 / 飞猪 / 携程</span>
+        <span class="kv-val">
+          <a class="ext-link" href="https://www.airasia.com" target="_blank" rel="noopener">AirAsia官网</a> ·
+          <a class="ext-link" href="https://www.fliggy.com" target="_blank" rel="noopener">飞猪</a> ·
+          <a class="ext-link" href="https://flights.ctrip.com" target="_blank" rel="noopener">携程</a>
+        </span>
       </div>
       <div class="kv-item" style="padding-top:8px;border-top:1px solid var(--border)">
         <span class="kv-key">廊曼→市区</span>
@@ -1068,7 +1203,7 @@
   <div class="big-card reveal">
     <div>
       <p class="big-card-label">推荐酒店</p>
-      <h3 class="big-card-name">ibis Bangkok<br>Sukhumvit 4</h3>
+      <h3 class="big-card-name"><a class="ext-link" href="https://www.agoda.com/en-gb/ibis-bangkok-sukhumvit-4/hotel/bangkok-th.html" target="_blank" rel="noopener">ibis Bangkok<br>Sukhumvit 4 ↗</a></h3>
       <p class="big-card-desc">曼谷黄金地段素坤逸路，BTS Asok 站步行5分钟，周边便利店餐厅林立，出行极方便。</p>
       <div style="margin-bottom:8px">
         <div class="price-badge">
@@ -1102,7 +1237,11 @@
       </div>
       <div class="kv-item">
         <span class="kv-key">预订渠道</span>
-        <span class="kv-val">Agoda（价格最低）/ 携程 / Booking</span>
+        <span class="kv-val">
+          <a class="ext-link" href="https://www.agoda.com/en-gb/ibis-bangkok-sukhumvit-4/hotel/bangkok-th.html" target="_blank" rel="noopener">Agoda（价格最低）</a> ·
+          <a class="ext-link" href="https://hotels.ctrip.com" target="_blank" rel="noopener">携程</a> ·
+          <a class="ext-link" href="https://www.booking.com/hotel/th/ibis-bangkok-sukhumvit-4.html" target="_blank" rel="noopener">Booking</a>
+        </span>
       </div>
     </div>
   </div>
@@ -1119,55 +1258,63 @@
   <p class="section-desc reveal">泰国必吃清单，每份标好价格，人均¥20起。</p>
 
   <div class="food-grid">
+    <a class="ext-link-card" href="https://www.google.com/maps/search/Pad+Thai+Bangkok" target="_blank" rel="noopener">
     <div class="food-card reveal reveal-delay-1">
-      <p class="food-name">泰式炒河粉</p>
+      <p class="food-name">泰式炒河粉 ↗</p>
       <p class="food-desc">Pad Thai · 最经典街头主食，香而不腻</p>
       <p class="food-price">80泰铢 ≈ ¥17</p>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.google.com/maps/search/Tom+Yum+Goong+Bangkok" target="_blank" rel="noopener">
     <div class="food-card reveal reveal-delay-2">
-      <p class="food-name">冬阴功汤</p>
+      <p class="food-name">冬阴功汤 ↗</p>
       <p class="food-desc">Tom Yum Goong · 酸辣鲜美，泰国国民汤</p>
       <p class="food-price">200泰铢 ≈ ¥43</p>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.google.com/maps/search/Green+Curry+Bangkok" target="_blank" rel="noopener">
     <div class="food-card reveal reveal-delay-3">
-      <p class="food-name">绿咖喱鸡饭</p>
+      <p class="food-name">绿咖喱鸡饭 ↗</p>
       <p class="food-desc">Green Curry · 椰香咖喱，下饭神器</p>
       <p class="food-price">150泰铢 ≈ ¥32</p>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.google.com/maps/search/Mango+Sticky+Rice+Bangkok" target="_blank" rel="noopener">
     <div class="food-card reveal reveal-delay-4">
-      <p class="food-name">芒果糯米饭</p>
+      <p class="food-name">芒果糯米饭 ↗</p>
       <p class="food-desc">Mango Sticky Rice · 甜品界神作，必吃</p>
       <p class="food-price">100泰铢 ≈ ¥21</p>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.google.com/maps/search/Thai+Tea+Bangkok" target="_blank" rel="noopener">
     <div class="food-card reveal reveal-delay-1">
-      <p class="food-name">泰式奶茶</p>
+      <p class="food-name">泰式奶茶 ↗</p>
       <p class="food-desc">Thai Tea · 橙色奶茶，街头随处可见</p>
       <p class="food-price">40泰铢 ≈ ¥9</p>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.google.com/maps/search/Boat+Noodles+Bangkok" target="_blank" rel="noopener">
     <div class="food-card reveal reveal-delay-2">
-      <p class="food-name">曼谷船面</p>
+      <p class="food-name">曼谷船面 ↗</p>
       <p class="food-desc">Boat Noodles · 特色小碗浓汤面，一碗不够</p>
       <p class="food-price">50泰铢/碗 ≈ ¥11</p>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.google.com/maps/search/Pattaya+Seafood+Restaurant" target="_blank" rel="noopener">
     <div class="food-card reveal reveal-delay-3">
-      <p class="food-name">芭提雅海鲜</p>
+      <p class="food-name">芭提雅海鲜 ↗</p>
       <p class="food-desc">新鲜烤海鲜按斤计价，Day 2 当地大排档</p>
       <p class="food-price">约400泰铢/人 ≈ ¥85</p>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.7-eleven.com.th" target="_blank" rel="noopener">
     <div class="food-card reveal reveal-delay-4">
-      <p class="food-name">7-11 宵夜</p>
+      <p class="food-name">7-11 宵夜 ↗</p>
       <p class="food-desc">演唱会后深夜，全天24小时，任何时间都开</p>
       <p class="food-price">60泰铢 ≈ ¥13</p>
-    </div>
+    </div></a>
   </div>
 
   <div style="margin-top:32px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px" class="reveal">
     <h3 style="font-size:16px;font-weight:600;margin-bottom:16px">🍽️ 推荐餐厅</h3>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;font-size:14px">
-      <div><strong>Pad Thai Fawng</strong><br><span style="color:var(--muted)">最正宗炒河粉 · 人均100泰铢（¥21）</span></div>
-      <div><strong>MBK Food Island</strong><br><span style="color:var(--muted)">经济美食广场 · 人均100泰铢（¥21）</span></div>
-      <div><strong>Or Tor Kor Market</strong><br><span style="color:var(--muted)">高档农贸市场 · 人均150泰铢（¥32）</span></div>
-      <div><strong>Asiatique 河畔夜市</strong><br><span style="color:var(--muted)">夜景+美食 · 人均250泰铢（¥53）</span></div>
+      <div><a class="ext-link" href="https://www.google.com/maps/search/Pad+Thai+Fawng+Bangkok" target="_blank" rel="noopener"><strong>Pad Thai Fawng ↗</strong></a><br><span style="color:var(--muted)">最正宗炒河粉 · 人均100泰铢（¥21）</span></div>
+      <div><a class="ext-link" href="https://www.google.com/maps/search/MBK+Food+Island+Bangkok" target="_blank" rel="noopener"><strong>MBK Food Island ↗</strong></a><br><span style="color:var(--muted)">经济美食广场 · 人均100泰铢（¥21）</span></div>
+      <div><a class="ext-link" href="https://www.google.com/maps/search/Or+Tor+Kor+Market+Bangkok" target="_blank" rel="noopener"><strong>Or Tor Kor Market ↗</strong></a><br><span style="color:var(--muted)">高档农贸市场 · 人均150泰铢（¥32）</span></div>
+      <div><a class="ext-link" href="https://www.google.com/maps/search/Asiatique+The+Riverfront+Bangkok" target="_blank" rel="noopener"><strong>Asiatique 河畔夜市 ↗</strong></a><br><span style="color:var(--muted)">夜景+美食 · 人均250泰铢（¥53）</span></div>
     </div>
     <p style="font-size:13px;color:var(--muted);margin-top:16px">💬 点餐时说"<strong style="color:var(--text)">Mai Phet</strong>"= 不辣 · 不要直接喝生水，买瓶装水（约15泰铢）</p>
   </div>
@@ -1184,56 +1331,64 @@
   <p class="section-desc reveal">本次行程大幅减少寺庙，以自然风光和海景为主。</p>
 
   <div class="info-grid">
+    <a class="ext-link-card" href="https://www.google.com/maps/search/Lumphini+Park+Bangkok" target="_blank" rel="noopener">
     <div class="info-card reveal reveal-delay-1" style="border-color:rgba(0,113,227,0.3)">
       <div class="info-card-icon">🌿</div>
-      <h3 class="info-card-title">伦披尼公园</h3>
+      <h3 class="info-card-title">伦披尼公园 ↗</h3>
       <p class="info-card-body">曼谷最大城市绿肺，湖景 · 晨练 · 巨型蜥蜴出没，放松散步。</p>
       <div style="margin-top:12px"><span class="chip chip-green">🆓 免费</span></div>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.kingpowermahanakhon.co.th" target="_blank" rel="noopener">
     <div class="info-card reveal reveal-delay-2" style="border-color:rgba(191,90,242,0.3)">
       <div class="info-card-icon">🌇</div>
-      <h3 class="info-card-title">Mahanakhon 天空栈道</h3>
+      <h3 class="info-card-title">Mahanakhon 天空栈道 ↗</h3>
       <p class="info-card-body">78层玻璃地板观景台，俯瞰整个曼谷，日落时分最美，拍照必打卡。</p>
       <div style="margin-top:12px"><span class="chip chip-gold">875泰铢/人（¥186）</span></div>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.asiatiquethailand.com" target="_blank" rel="noopener">
     <div class="info-card reveal reveal-delay-3" style="border-color:rgba(0,113,227,0.3)">
       <div class="info-card-icon">🌊</div>
-      <h3 class="info-card-title">Asiatique 河畔夜市</h3>
+      <h3 class="info-card-title">Asiatique 河畔夜市 ↗</h3>
       <p class="info-card-body">湄南河畔户外夜市，摩天轮夜景，多国美食，气氛热闹。</p>
       <div style="margin-top:12px"><span class="chip chip-green">🆓 免费入场</span></div>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.banyantree.com/thailand/bangkok/vertigo-and-moon-bar" target="_blank" rel="noopener">
     <div class="info-card reveal reveal-delay-4" style="border-color:rgba(255,214,10,0.3)">
       <div class="info-card-icon">🍹</div>
-      <h3 class="info-card-title">Vertigo Rooftop Bar</h3>
+      <h3 class="info-card-title">Vertigo Rooftop Bar ↗</h3>
       <p class="info-card-body">Banyan Tree 61层，360°无遮挡曼谷夜景，点饮品即可入场。</p>
       <div style="margin-top:12px"><span class="chip chip-gold">最低消费600泰铢/人（¥127）</span></div>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.google.com/maps/search/Koh+Larn+Pattaya" target="_blank" rel="noopener">
     <div class="info-card reveal reveal-delay-1" style="border-color:rgba(48,209,88,0.3)">
       <div class="info-card-icon">🏝️</div>
-      <h3 class="info-card-title">珊瑚岛（Koh Larn）</h3>
+      <h3 class="info-card-title">珊瑚岛（Koh Larn）↗</h3>
       <p class="info-card-body">芭提雅最美海岛，白沙滩 · 碧蓝海水 · 浮潜看珊瑚鱼群，Day 2 全天重点！</p>
       <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
         <span class="chip chip-green">渡轮30泰铢/人（¥13）</span>
         <span class="chip chip-gold">浮潜装备150泰铢（¥32）</span>
       </div>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.google.com/maps/search/Pattaya+Beach" target="_blank" rel="noopener">
     <div class="info-card reveal reveal-delay-2" style="border-color:rgba(48,209,88,0.3)">
       <div class="info-card-icon">🏖️</div>
-      <h3 class="info-card-title">芭提雅海滩</h3>
+      <h3 class="info-card-title">芭提雅海滩 ↗</h3>
       <p class="info-card-body">落日余晖，海边漫步，自然海景放松身心。</p>
       <div style="margin-top:12px"><span class="chip chip-green">🆓 免费</span></div>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.google.com/maps/search/Chatuchak+Weekend+Market+Bangkok" target="_blank" rel="noopener">
     <div class="info-card reveal reveal-delay-3" style="border-color:rgba(191,90,242,0.3)">
       <div class="info-card-icon">🛍️</div>
-      <h3 class="info-card-title">恰图恰市集</h3>
+      <h3 class="info-card-title">恰图恰市集 ↗</h3>
       <p class="info-card-body">5000+摊位超大户外市集，特色手工艺品 · 服装 · 小食，气氛热闹。</p>
       <div style="margin-top:12px"><span class="chip chip-green">🆓 免费入场</span></div>
-    </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.google.com/maps/search/Koh+Larn+Water+Sports+Pattaya" target="_blank" rel="noopener">
     <div class="info-card reveal reveal-delay-4">
       <div class="info-card-icon">💡</div>
-      <h3 class="info-card-title">水上活动自选</h3>
+      <h3 class="info-card-title">水上活动自选 ↗</h3>
       <p class="info-card-body">珊瑚岛可选项目：<br>摩托艇 600泰铢/人（¥127）<br>香蕉船 200泰铢/人（¥43）<br>玻璃底船 100泰铢/人（¥21）</p>
-    </div>
+    </div></a>
   </div>
 </section>
 
@@ -1295,27 +1450,27 @@
     <div class="budget-item reveal reveal-delay-1">
       <div class="budget-item-emoji">✈️</div>
       <div class="budget-item-label">机票（2人）</div>
-      <div class="budget-item-val">¥1,400</div>
+      <div class="budget-item-val"><span class="count-num" data-target="1400">0</span></div>
     </div>
     <div class="budget-item reveal reveal-delay-2">
       <div class="budget-item-emoji">🏨</div>
       <div class="budget-item-label">酒店 2晚（2人）</div>
-      <div class="budget-item-val">¥800</div>
+      <div class="budget-item-val"><span class="count-num" data-target="800">0</span></div>
     </div>
     <div class="budget-item reveal reveal-delay-3">
       <div class="budget-item-emoji">🌴</div>
       <div class="budget-item-label">在泰花费</div>
-      <div class="budget-item-val">¥4,615</div>
+      <div class="budget-item-val"><span class="count-num" data-target="4615">0</span></div>
     </div>
     <div class="budget-item reveal reveal-delay-4" style="border-color:rgba(48,209,88,0.3)">
       <div class="budget-item-emoji">📊</div>
       <div class="budget-item-label">总计（2人，不含演唱会票）</div>
-      <div class="budget-item-val" style="color:var(--teal)">¥6,975</div>
+      <div class="budget-item-val" style="color:var(--teal)">¥<span class="count-num" data-target="6975">0</span></div>
     </div>
     <div class="budget-item reveal reveal-delay-5">
       <div class="budget-item-emoji">👤</div>
       <div class="budget-item-label">人均（不含演唱会票）</div>
-      <div class="budget-item-val">¥3,488</div>
+      <div class="budget-item-val">¥<span class="count-num" data-target="3488">0</span></div>
     </div>
   </div>
 
@@ -1340,7 +1495,7 @@
       <div class="tip-card-title">🚨 安全</div>
       <ul class="tip-list">
         <li>包朝前背，人流密集处防扒手</li>
-        <li>打车统一用 <strong style="color:var(--text)">Grab APP</strong>，价格透明不被宰</li>
+        <li>打车统一用 <a class="ext-link" href="https://www.grab.com/th/" target="_blank" rel="noopener"><strong style="color:var(--text)">Grab APP ↗</strong></a>，价格透明不被宰</li>
         <li>非必要不租摩托车，事故率高</li>
         <li>珊瑚岛5月有浪，不会游泳请穿救生衣</li>
         <li>不要直接饮用生水</li>
@@ -1384,11 +1539,11 @@
     <div class="tip-card reveal reveal-delay-2">
       <div class="tip-card-title">📱 必备APP</div>
       <ul class="tip-list">
-        <li><strong style="color:var(--text)">Grab</strong> — 打车/外卖，必装</li>
-        <li><strong style="color:var(--text)">Google Maps</strong> — 导航+BTS路线</li>
-        <li><strong style="color:var(--text)">Google翻译</strong> — 中泰互译，下载离线包</li>
-        <li><strong style="color:var(--text)">XE Currency</strong> — 实时汇率</li>
-        <li><strong style="color:var(--text)">Agoda</strong> — 东南亚最优惠订酒店</li>
+        <li><a class="ext-link" href="https://www.grab.com/th/" target="_blank" rel="noopener"><strong style="color:var(--text)">Grab ↗</strong></a> — 打车/外卖，必装</li>
+        <li><a class="ext-link" href="https://maps.google.com" target="_blank" rel="noopener"><strong style="color:var(--text)">Google Maps ↗</strong></a> — 导航+BTS路线</li>
+        <li><a class="ext-link" href="https://translate.google.com" target="_blank" rel="noopener"><strong style="color:var(--text)">Google翻译 ↗</strong></a> — 中泰互译，下载离线包</li>
+        <li><a class="ext-link" href="https://www.xe.com" target="_blank" rel="noopener"><strong style="color:var(--text)">XE Currency ↗</strong></a> — 实时汇率</li>
+        <li><a class="ext-link" href="https://www.agoda.com" target="_blank" rel="noopener"><strong style="color:var(--text)">Agoda ↗</strong></a> — 东南亚最优惠订酒店</li>
       </ul>
     </div>
   </div>
@@ -1434,7 +1589,7 @@
     <div class="info-card reveal reveal-delay-1">
       <div class="info-card-icon">🎫</div>
       <h3 class="info-card-title">票务</h3>
-      <p class="info-card-body">关注赵露思官方账号 + 演唱会主办方官网购票。<br><br>二手票：大麦网 / 摩天轮票务 / StubHub，注意防诈骗。<br><br>提前截图保存，同时下载PDF备用。</p>
+      <p class="info-card-body">关注赵露思官方账号 + 演唱会主办方官网购票。<br><br>二手票：<a class="ext-link" href="https://www.damai.cn" target="_blank" rel="noopener">大麦网 ↗</a> / <a class="ext-link" href="https://www.motianlun.com" target="_blank" rel="noopener">摩天轮票务 ↗</a> / <a class="ext-link" href="https://www.stubhub.com" target="_blank" rel="noopener">StubHub ↗</a>，注意防诈骗。<br><br>提前截图保存，同时下载PDF备用。</p>
     </div>
     <div class="info-card reveal reveal-delay-2">
       <div class="info-card-icon">⏰</div>
@@ -1468,14 +1623,21 @@
 
 
 <script>
+  // ── Scroll progress bar ──
+  const progressBar = document.getElementById('progress-bar');
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docH = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (docH > 0 ? (scrollTop / docH) * 100 : 0) + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+
   // ── Smooth scroll on nav button click ──
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const id = btn.dataset.target;
       const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
 
@@ -1489,48 +1651,102 @@
     for (const id of sections) {
       const el = document.getElementById(id);
       if (!el) continue;
-      const rect = el.getBoundingClientRect();
-      if (rect.top <= NAV_H + 40) current = id;
+      if (el.getBoundingClientRect().top <= NAV_H + 40) current = id;
     }
-    navButtons.forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.target === current);
-    });
+    navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.target === current));
   }
-
   window.addEventListener('scroll', updateActive, { passive: true });
   updateActive();
 
-  // ── Scroll-triggered reveal ──
-  const revealEls = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
+  // ── Scroll-triggered reveal (all variants) ──
+  const allReveal = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+  const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
+        revealObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+  }, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
+  allReveal.forEach(el => revealObserver.observe(el));
 
-  revealEls.forEach(el => observer.observe(el));
+  // ── Count-up animation ──
+  function animateCount(el, target, duration) {
+    const start = performance.now();
+    function step(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const val = Math.round(eased * target);
+      el.textContent = val.toLocaleString('zh-CN');
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  const countObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const target = parseInt(entry.target.dataset.target, 10);
+        animateCount(entry.target, target, 1400);
+        countObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.count-num').forEach(el => countObserver.observe(el));
 
   // ── Parallax hero bg on scroll ──
   const heroBg = document.querySelector('.hero-bg');
   window.addEventListener('scroll', () => {
-    const y = window.scrollY;
-    if (heroBg) {
-      heroBg.style.transform = `translateY(${y * 0.3}px)`;
-    }
+    if (heroBg) heroBg.style.transform = `translateY(${window.scrollY * 0.3}px)`;
   }, { passive: true });
 
   // ── Nav blur changes on scroll ──
   const nav = document.getElementById('nav');
   window.addEventListener('scroll', () => {
-    if (window.scrollY > 60) {
-      nav.style.background = 'rgba(0,0,0,0.85)';
-    } else {
-      nav.style.background = 'rgba(0,0,0,0.72)';
-    }
+    nav.style.background = window.scrollY > 60
+      ? 'rgba(0,0,0,0.88)'
+      : 'rgba(0,0,0,0.72)';
   }, { passive: true });
+
+  // ── Hero mouse parallax ──
+  const heroSection = document.getElementById('hero');
+  const heroTitle   = heroSection.querySelector('.hero-title');
+  const heroSub     = heroSection.querySelector('.hero-sub');
+  heroSection.addEventListener('mousemove', (e) => {
+    const cx = heroSection.clientWidth  / 2;
+    const cy = heroSection.clientHeight / 2;
+    const dx = (e.clientX - cx) / cx;
+    const dy = (e.clientY - cy) / cy;
+    if (heroTitle) heroTitle.style.transform = `translate(${dx * 10}px, ${dy * 6}px)`;
+    if (heroSub)   heroSub.style.transform   = `translate(${dx * 5}px,  ${dy * 3}px)`;
+  });
+  heroSection.addEventListener('mouseleave', () => {
+    if (heroTitle) heroTitle.style.transform = '';
+    if (heroSub)   heroSub.style.transform   = '';
+  });
+
+  // ── Generate floating particles ──
+  (function spawnParticles() {
+    const container = document.getElementById('particles');
+    if (!container) return;
+    const COLORS = ['rgba(0,113,227,0.6)','rgba(191,90,242,0.5)','rgba(48,209,88,0.4)','rgba(255,214,10,0.35)'];
+    for (let i = 0; i < 28; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = 3 + Math.random() * 6;
+      p.style.cssText = [
+        `width:${size}px`, `height:${size}px`,
+        `left:${Math.random() * 100}%`,
+        `top:${60 + Math.random() * 40}%`,
+        `background:${COLORS[i % COLORS.length]}`,
+        `animation-duration:${8 + Math.random() * 14}s`,
+        `animation-delay:${Math.random() * 10}s`,
+        `filter:blur(${Math.random() < 0.4 ? 1 : 0}px)`
+      ].join(';');
+      container.appendChild(p);
+    }
+  })();
 </script>
 </body>
 </html>
