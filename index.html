@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌏 和天真的泰国之旅</title>
+  <style>
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #000;
+      --surface: #111;
+      --surface2: #1a1a1a;
+      --border: rgba(255,255,255,0.08);
+      --text: #f5f5f7;
+      --muted: #86868b;
+      --accent: #0071e3;
+      --accent2: #bf5af2;
+      --gold: #ffd60a;
+      --teal: #30d158;
+      --red: #ff453a;
+      --radius: 18px;
+      --radius-sm: 10px;
+      --nav-h: 52px;
+      --transition: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── Scroll bar ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+    /* ─── Sticky Nav ─── */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      height: var(--nav-h);
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 16px;
+      transition: background 0.4s var(--transition);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    #nav::-webkit-scrollbar { display: none; }
+    .nav-btn {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: color 0.3s var(--transition), background 0.3s var(--transition);
+      white-space: nowrap;
+    }
+    .nav-btn:hover { color: var(--text); }
+    .nav-btn.active {
+      color: var(--bg);
+      background: var(--text);
+    }
+
+    /* ─── Hero ─── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,113,227,0.25) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(191,90,242,0.2) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 20% 70%, rgba(48,209,88,0.12) 0%, transparent 55%);
+      animation: hero-bg-shift 12s ease-in-out infinite alternate;
+    }
+    @keyframes hero-bg-shift {
+      0%   { filter: hue-rotate(0deg) brightness(1); }
+      100% { filter: hue-rotate(30deg) brightness(1.1); }
+    }
+    .hero-tag {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fade-up 0.9s 0.2s var(--transition) forwards;
+    }
+    .hero-title {
+      font-size: clamp(36px, 7vw, 80px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fade-up 0.9s 0.4s var(--transition) forwards;
+    }
+    .hero-sub {
+      font-size: clamp(16px, 2.5vw, 22px);
+      color: var(--muted);
+      max-width: 600px;
+      line-height: 1.55;
+      margin-bottom: 40px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fade-up 0.9s 0.6s var(--transition) forwards;
+    }
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fade-up 0.9s 0.8s var(--transition) forwards;
+    }
+    .hero-stat {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .hero-stat strong { display: block; font-size: 18px; color: #fff; }
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      animation: bounce 2s infinite;
+      opacity: 0;
+      animation: fade-up 1s 1.2s var(--transition) forwards, bounce 2s 1.2s infinite;
+    }
+    .scroll-hint svg { animation: bounce 2s infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ─── Section wrapper ─── */
+    section {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 96px 24px;
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(28px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .section-desc {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 580px;
+      margin-bottom: 48px;
+    }
+    .section-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 0;
+    }
+
+    /* ─── Reveal animation ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s var(--transition), transform 0.8s var(--transition);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+
+    @keyframes fade-up {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Day Cards ─── */
+    .day-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+    .day-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      cursor: default;
+      transition: transform 0.4s var(--transition), box-shadow 0.4s var(--transition), border-color 0.4s var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .day-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--accent));
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .day-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      border-color: rgba(255,255,255,0.15);
+    }
+    .day-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .day-badge {
+      background: var(--card-accent, var(--accent));
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+    }
+    .day-name { font-size: 15px; font-weight: 600; }
+    .day-desc { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+    .day-total {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--teal);
+      padding: 8px 14px;
+      background: rgba(48,209,88,0.1);
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    /* ─── Timeline ─── */
+    .timeline { position: relative; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 16px; top: 8px; bottom: 8px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--accent), var(--accent2));
+      border-radius: 1px;
+    }
+    .tl-item {
+      display: flex;
+      gap: 24px;
+      padding: 12px 0;
+      padding-left: 48px;
+      position: relative;
+    }
+    .tl-dot {
+      position: absolute;
+      left: 9px;
+      top: 18px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 2px solid var(--accent);
+      flex-shrink: 0;
+    }
+    .tl-time {
+      font-size: 12px;
+      color: var(--muted);
+      min-width: 90px;
+      padding-top: 2px;
+      flex-shrink: 0;
+    }
+    .tl-content { flex: 1; }
+    .tl-activity { font-size: 14px; font-weight: 500; margin-bottom: 4px; line-height: 1.4; }
+    .tl-cost {
+      font-size: 12px;
+      color: var(--gold);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .tl-cost.free { color: var(--teal); }
+
+    /* ─── Info cards ─── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: transform 0.3s var(--transition), box-shadow 0.3s var(--transition);
+    }
+    .info-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+    .info-card-icon { font-size: 32px; margin-bottom: 12px; }
+    .info-card-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .info-card-body { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* ─── Ticket / Hotel big card ─── */
+    .big-card {
+      background: linear-gradient(135deg, var(--surface) 0%, #161620 100%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+    @media (max-width: 640px) {
+      .big-card { grid-template-columns: 1fr; padding: 24px; }
+    }
+    .big-card-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .big-card-name { font-size: 26px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.02em; }
+    .big-card-desc { font-size: 15px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+    .price-badge {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .price-num {
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.03em;
+    }
+    .price-unit { font-size: 16px; color: var(--muted); }
+    .price-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .kv-list { display: flex; flex-direction: column; gap: 12px; }
+    .kv-item { display: flex; justify-content: space-between; align-items: flex-start; font-size: 14px; gap: 12px; }
+    .kv-key { color: var(--muted); flex-shrink: 0; }
+    .kv-val { text-align: right; font-weight: 500; }
+
+    /* ─── Food / Attraction grid ─── */
+    .food-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .food-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+      transition: transform 0.3s var(--transition), background 0.3s var(--transition);
+    }
+    .food-card:hover {
+      transform: scale(1.03);
+      background: var(--surface2);
+    }
+    .food-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .food-desc { font-size: 12px; color: var(--muted); margin-bottom: 10px; line-height: 1.4; }
+    .food-price {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold);
+    }
+
+    /* ─── Budget table ─── */
+    .budget-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: rgba(255,255,255,0.03);
+    }
+    tr:last-child td { border-bottom: none; }
+    td:last-child { text-align: right; font-weight: 500; }
+    .row-total td {
+      font-weight: 700;
+      color: var(--teal);
+      font-size: 16px;
+    }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ─── Budget summary cards ─── */
+    .budget-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .budget-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+    }
+    .budget-item-emoji { font-size: 28px; margin-bottom: 8px; }
+    .budget-item-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .budget-item-val { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+
+    /* ─── Tip cards ─── */
+    .tip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .tip-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .tip-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tip-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .tip-list li {
+      font-size: 13px;
+      color: var(--muted);
+      padding-left: 14px;
+      position: relative;
+      line-height: 1.5;
+    }
+    .tip-list li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ─── Concert section ─── */
+    .concert-hero {
+      background: linear-gradient(135deg, #1a0030 0%, #0a001a 50%, #000 100%);
+      border: 1px solid rgba(191,90,242,0.3);
+      border-radius: 24px;
+      padding: 56px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .concert-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(191,90,242,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .concert-title {
+      font-size: clamp(24px, 5vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #fff 0%, #bf5af2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .concert-date {
+      font-size: 17px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    .checklist {
+      text-align: left;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 440px;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      color: var(--text);
+    }
+    .check-box {
+      width: 20px; height: 20px;
+      border-radius: 6px;
+      border: 2px solid var(--accent2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      text-align: center;
+      padding: 64px 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    footer strong { color: var(--text); }
+
+    /* ─── Scroll progress bar ─── */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--teal));
+      z-index: 1000;
+      transition: width 0.1s linear;
+      border-radius: 0 2px 2px 0;
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    /* ─── External link styling ─── */
+    .ext-link {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      transition: color 0.25s, border-color 0.25s;
+      cursor: pointer;
+    }
+    .ext-link:hover {
+      color: #5ac8fa;
+      border-color: #5ac8fa;
+    }
+    .ext-link-card {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+    }
+    .ext-link-card:hover .info-card,
+    .ext-link-card:hover .food-card,
+    .ext-link-card:hover .day-card {
+      border-color: rgba(90,200,250,0.4);
+      box-shadow: 0 0 20px rgba(90,200,250,0.15), 0 16px 40px rgba(0,0,0,0.4);
+    }
+
+    /* ─── Reveal variants ─── */
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.7s var(--transition), transform 0.7s var(--transition);
+    }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.7s var(--transition), transform 0.7s var(--transition);
+    }
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.88);
+      transition: opacity 0.7s var(--transition), transform 0.7s var(--transition);
+    }
+    .reveal-left.visible,
+    .reveal-right.visible,
+    .reveal-scale.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ─── Float animation for hero stats ─── */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+    .hero-stat { animation: float 4s ease-in-out infinite; }
+    .hero-stat:nth-child(2) { animation-delay: 0.5s; }
+    .hero-stat:nth-child(3) { animation-delay: 1s; }
+    .hero-stat:nth-child(4) { animation-delay: 1.5s; }
+
+    /* ─── Particles in hero ─── */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+      animation: particle-rise linear infinite;
+    }
+    @keyframes particle-rise {
+      0%   { opacity: 0; transform: translateY(0) scale(0); }
+      10%  { opacity: 0.6; }
+      90%  { opacity: 0.4; }
+      100% { opacity: 0; transform: translateY(-120vh) scale(1.2); }
+    }
+
+    /* ─── Timeline dot pulse ─── */
+    .tl-dot {
+      animation: dot-pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes dot-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,113,227,0.4); }
+      50%       { box-shadow: 0 0 0 5px rgba(0,113,227,0); }
+    }
+
+    /* ─── Glow card hover ─── */
+    .info-card:hover {
+      border-color: rgba(90,200,250,0.35) !important;
+      box-shadow: 0 0 24px rgba(90,200,250,0.1), 0 16px 40px rgba(0,0,0,0.4);
+    }
+
+    /* ─── Count-up number style ─── */
+    .count-num { display: inline-block; }
+
+    /* ─── Book/open button ─── */
+    .open-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      padding: 9px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      text-decoration: none;
+      transition: background 0.3s, border-color 0.3s, transform 0.2s;
+      cursor: pointer;
+    }
+    .open-btn:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.35);
+      transform: translateY(-2px);
+      color: #fff;
+    }
+    .open-btn svg { flex-shrink: 0; }
+
+    /* ─── Route Map ─── */
+    .map-wrapper {
+      background: #070d1c;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    #routeCanvas {
+      display: block;
+      width: 100%;
+    }
+    .map-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .leg-item { display: flex; align-items: center; gap: 7px; }
+    .leg-line {
+      display: inline-block;
+      width: 26px;
+      height: 3px;
+      border-radius: 2px;
+    }
+    .leg-line-dash { background: repeating-linear-gradient(90deg, var(--c) 0 6px, transparent 6px 11px); }
+    .leg-line-solid { background: var(--c); }
+    .leg-line-dot   { background: repeating-linear-gradient(90deg, var(--c) 0 3px, transparent 3px 7px); }
+
+    /* ─── Misc chips ─── */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .chip-blue { background: rgba(0,113,227,0.15); color: #5ac8fa; }
+    .chip-green { background: rgba(48,209,88,0.12); color: var(--teal); }
+    .chip-gold { background: rgba(255,214,10,0.12); color: var(--gold); }
+    .chip-purple { background: rgba(191,90,242,0.15); color: #bf5af2; }
+    .chip-red { background: rgba(255,69,58,0.12); color: var(--red); }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- ══════════════════════════════════════
+     NAVIGATION
+══════════════════════════════════════ -->
+<nav id="nav">
+  <button class="nav-btn" data-target="itinerary">🗓 行程</button>
+  <button class="nav-btn" data-target="prepare">📋 准备</button>
+  <button class="nav-btn" data-target="flight">✈️ 机票</button>
+  <button class="nav-btn" data-target="hotel">🏨 酒店</button>
+  <button class="nav-btn" data-target="food">🍜 餐饮</button>
+  <button class="nav-btn" data-target="attractions">🏝 景点</button>
+  <button class="nav-btn" data-target="budget">💰 预算</button>
+  <button class="nav-btn" data-target="tips">💡 贴士</button>
+  <button class="nav-btn" data-target="concert">🎤 演唱会</button>
+  <button class="nav-btn" data-target="routemap">🗺 路线图</button>
+</nav>
+
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section id="hero" style="padding-top: var(--nav-h)">
+  <div class="hero-bg"></div>
+  <div id="particles"></div>
+  <p class="hero-tag">2025 · 广州 → 曼谷 + 芭提雅</p>
+  <h1 class="hero-title">和天真的<br>泰国之旅</h1>
+  <p class="hero-sub">5月7日 – 10日 · 2人 · 赵露思演唱会 · 珊瑚岛<br>白沙滩 · 河畔夜景 · 演唱会应援 · 最美回忆</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>3 天</strong>在泰时间</div>
+    <div class="hero-stat"><strong>¥700/人</strong>往返机票</div>
+    <div class="hero-stat"><strong>¥400/晚</strong>精品酒店</div>
+    <div class="hero-stat"><strong>¥6,975</strong>2人总预算（不含演唱会票）</div>
+  </div>
+  <div class="scroll-hint">
+    <span>向下滚动</span>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     每日行程
+══════════════════════════════════════ -->
+<div class="section-divider"></div>
+<section id="itinerary">
+  <p class="section-label reveal">旅途安排</p>
+  <h2 class="section-title reveal">每日详细行程</h2>
+  <p class="section-desc reveal">从出发到返回，4天完整安排一览。重点：Day 2 珊瑚岛看海。</p>
+
+  <!-- Day overview cards -->
+  <div class="day-grid">
+    <div class="day-card reveal reveal-delay-1" style="--card-accent:#0071e3">
+      <div class="day-card-header">
+        <span class="day-badge">Day 1</span>
+        <span class="day-name">5月7日 周三</span>
+      </div>
+      <p class="day-desc">凌晨从广州出发，抵达曼谷，伦披尼公园 · Mahanakhon天空栈道 · 河畔夜市 · Rooftop Bar</p>
+      <span class="day-total">2人约 ¥1,300</span>
+    </div>
+    <div class="day-card reveal reveal-delay-2" style="--card-accent:#30d158">
+      <div class="day-card-header">
+        <span class="day-badge" style="background:#30d158">Day 2</span>
+        <span class="day-name">5月8日 周四</span>
+      </div>
+      <p class="day-desc">🏝️ 全天芭提雅珊瑚岛！白沙滩浮潜 · 芭提雅落日海滩 · 海鲜晚餐</p>
+      <span class="day-total">2人约 ¥1,700</span>
+    </div>
+    <div class="day-card reveal reveal-delay-3" style="--card-accent:#bf5af2">
+      <div class="day-card-header">
+        <span class="day-badge" style="background:#bf5af2">Day 3</span>
+        <span class="day-name">5月9日 周五</span>
+      </div>
+      <p class="day-desc">恰图恰市集 · 咖啡打卡 · 🎤 赵露思演唱会！全场应援</p>
+      <span class="day-total">2人约 ¥700</span>
+    </div>
+    <div class="day-card reveal reveal-delay-4" style="--card-accent:#ffd60a">
+      <div class="day-card-header">
+        <span class="day-badge" style="background:#ffd60a;color:#000">Day 4</span>
+        <span class="day-name">5月10日 周六</span>
+      </div>
+      <p class="day-desc">退房 · 买伴手礼 · 乘机返回广州 🛫</p>
+      <span class="day-total" style="color:#ffd60a;background:rgba(255,214,10,0.1)">离境日</span>
+    </div>
+  </div>
+
+  <!-- Day 1 timeline -->
+  <h3 class="reveal" style="font-size:20px;font-weight:600;margin:48px 0 20px;letter-spacing:-0.01em">
+    Day 1 · 5月7日 — 抵达 &amp; 曼谷市区
+  </h3>
+  <div class="timeline">
+    <div class="tl-item reveal-left">
+      <div class="tl-dot"></div>
+      <div class="tl-time">凌晨</div>
+      <div class="tl-content">
+        <p class="tl-activity">✈️ <a class="ext-link" href="https://www.baiyunairport.com" target="_blank" rel="noopener">广州白云机场 ↗</a>出发（提前2小时到机场）</p>
+      </div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot"></div>
+      <div class="tl-time">04:00–06:00</div>
+      <div class="tl-content">
+        <p class="tl-activity">抵达<a class="ext-link" href="https://maps.apple.com/?q=Don+Mueang+International+Airport&ll=13.9126,100.6069" target="_blank" rel="noopener">曼谷廊曼机场（DMK）↗</a></p>
+      </div>
+    </div>
+    <div class="tl-item reveal-left">
+      <div class="tl-dot"></div>
+      <div class="tl-time">06:00–07:00</div>
+      <div class="tl-content">
+        <p class="tl-activity">购买 <a class="ext-link" href="https://www.ais.th/traveler/" target="_blank" rel="noopener">AIS SIM卡 ↗</a> + 换泰铢 + 通关</p>
+        <span class="tl-cost">SIM卡 100泰铢/人 ≈ ¥84（2人）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot"></div>
+      <div class="tl-time">07:00–08:30</div>
+      <div class="tl-content">
+        <p class="tl-activity">乘 A1 公路巴士到 Mo Chit 站，转 BTS 入住酒店</p>
+        <span class="tl-cost">约130泰铢 ≈ ¥55（2人）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-left">
+      <div class="tl-dot"></div>
+      <div class="tl-time">10:00–12:00</div>
+      <div class="tl-content">
+        <p class="tl-activity">🌿 <a class="ext-link" href="https://maps.apple.com/?q=Lumphini+Park&ll=13.7305,100.5419" target="_blank" rel="noopener">伦披尼公园（Lumphini Park）↗</a>——湖景绿地，悠闲散步</p>
+        <span class="tl-cost free">免费</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot"></div>
+      <div class="tl-time">12:00–13:30</div>
+      <div class="tl-content">
+        <p class="tl-activity">🍜 午餐：<a class="ext-link" href="https://maps.apple.com/?q=MBK+Center+Bangkok&ll=13.7450,100.5297" target="_blank" rel="noopener">暹罗区 MBK 美食广场 ↗</a></p>
+        <span class="tl-cost">约120泰铢/人 ≈ ¥102（2人）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-left">
+      <div class="tl-dot"></div>
+      <div class="tl-time">13:30–16:00</div>
+      <div class="tl-content">
+        <p class="tl-activity">🛍️ <a class="ext-link" href="https://maps.apple.com/?q=Siam+Paragon&ll=13.7463,100.5347" target="_blank" rel="noopener">暹罗商圈（Siam Paragon / MBK）↗</a> 逛街</p>
+        <span class="tl-cost free">按需消费</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot"></div>
+      <div class="tl-time">16:00–17:30</div>
+      <div class="tl-content">
+        <p class="tl-activity">🌇 <a class="ext-link" href="https://www.kingpowermahanakhon.co.th" target="_blank" rel="noopener">Mahanakhon 天空栈道 ↗</a>——78层玻璃地板，俯瞰全曼谷</p>
+        <span class="tl-cost">875泰铢/人 ≈ ¥372（2人）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-left">
+      <div class="tl-dot"></div>
+      <div class="tl-time">18:00–20:30</div>
+      <div class="tl-content">
+        <p class="tl-activity">🌊 <a class="ext-link" href="https://www.asiatiquethailand.com" target="_blank" rel="noopener">Asiatique 河畔夜市 ↗</a>——湄南河夜景 + 摩天轮 + 美食</p>
+        <span class="tl-cost">免费入场，餐饮250泰铢/人 ≈ ¥212（2人）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot"></div>
+      <div class="tl-time">20:30–22:00</div>
+      <div class="tl-content">
+        <p class="tl-activity">🍹 <a class="ext-link" href="https://www.banyantree.com/thailand/bangkok/vertigo-and-moon-bar" target="_blank" rel="noopener">Vertigo Rooftop Bar（Banyan Tree 顶层）↗</a>——360° 夜景</p>
+        <span class="tl-cost">最低消费600泰铢/人 ≈ ¥255（2人合计）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-left">
+      <div class="tl-dot"></div>
+      <div class="tl-time">22:00</div>
+      <div class="tl-content">
+        <p class="tl-activity"><a class="ext-link" href="https://www.grab.com/th/" target="_blank" rel="noopener">Grab ↗</a> 打车返回酒店休息</p>
+        <span class="tl-cost">约100泰铢 ≈ ¥42</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day 2 timeline -->
+  <h3 class="reveal" style="font-size:20px;font-weight:600;margin:48px 0 20px;letter-spacing:-0.01em;color:#30d158">
+    Day 2 · 5月8日 — 🏝️ 芭提雅 · 珊瑚岛
+  </h3>
+  <div class="timeline">
+    <div class="tl-item reveal-left">
+      <div class="tl-dot" style="border-color:#30d158"></div>
+      <div class="tl-time">06:30–07:00</div>
+      <div class="tl-content">
+        <p class="tl-activity">酒店早餐 / 便利店早餐</p>
+        <span class="tl-cost">约80泰铢/人 ≈ ¥68（2人）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot" style="border-color:#30d158"></div>
+      <div class="tl-time">07:00–09:00</div>
+      <div class="tl-content">
+        <p class="tl-activity">🚌 <a class="ext-link" href="https://maps.apple.com/?q=Ekkamai+Bus+Terminal&ll=13.7198,100.5873" target="_blank" rel="noopener">Ekkamai 长途巴士站 ↗</a>乘大巴前往芭提雅</p>
+        <span class="tl-cost">131泰铢/人 ≈ ¥111（2人）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-left">
+      <div class="tl-dot" style="border-color:#30d158"></div>
+      <div class="tl-time">09:00–09:30</div>
+      <div class="tl-content">
+        <p class="tl-activity">芭提雅市区转摩的 / 双条车→ <a class="ext-link" href="https://maps.apple.com/?q=Bali+Hai+Pier+Pattaya&ll=12.9269,100.8786" target="_blank" rel="noopener">Bali Hai Pier 码头 ↗</a></p>
+        <span class="tl-cost">约100泰铢 ≈ ¥42（2人）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot" style="border-color:#30d158"></div>
+      <div class="tl-time">09:30–10:00</div>
+      <div class="tl-content">
+        <p class="tl-activity">🚢 渡轮前往<a class="ext-link" href="https://maps.apple.com/?q=Koh+Larn+Coral+Island&ll=12.9088,100.7736" target="_blank" rel="noopener">珊瑚岛（Koh Larn）↗</a></p>
+        <span class="tl-cost">30泰铢/人 ≈ ¥25（单程）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-left">
+      <div class="tl-dot" style="border-color:#30d158"></div>
+      <div class="tl-time">10:00–15:30</div>
+      <div class="tl-content">
+        <p class="tl-activity">🏝️ 珊瑚岛全天——白沙滩 · 浮潜 · 摩托艇 · 海鲜午餐</p>
+        <span class="tl-cost">浮潜装备¥64；午餐¥170/人；摩托艇可选¥255/人</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot" style="border-color:#30d158"></div>
+      <div class="tl-time">15:30–16:00</div>
+      <div class="tl-content">
+        <p class="tl-activity">🚢 渡轮返回芭提雅码头</p>
+        <span class="tl-cost">30泰铢/人 ≈ ¥25</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-left">
+      <div class="tl-dot" style="border-color:#30d158"></div>
+      <div class="tl-time">16:00–17:30</div>
+      <div class="tl-content">
+        <p class="tl-activity">🌅 <a class="ext-link" href="https://maps.apple.com/?q=Pattaya+Beach&ll=12.9347,100.8824" target="_blank" rel="noopener">芭提雅海滩 ↗</a>——落日余晖，沙滩漫步拍照</p>
+        <span class="tl-cost free">免费</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot" style="border-color:#30d158"></div>
+      <div class="tl-time">17:30–18:30</div>
+      <div class="tl-content">
+        <p class="tl-activity">🦞 <a class="ext-link" href="https://maps.apple.com/?q=Pattaya+Seafood+Restaurant&ll=12.9297,100.8774" target="_blank" rel="noopener">芭提雅海鲜大排档晚餐 ↗</a>——新鲜海鲜按斤计价</p>
+        <span class="tl-cost">约400泰铢/人 ≈ ¥340（2人）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-left">
+      <div class="tl-dot" style="border-color:#30d158"></div>
+      <div class="tl-time">18:30–20:30</div>
+      <div class="tl-content">
+        <p class="tl-activity">🚌 大巴返回曼谷</p>
+        <span class="tl-cost">131泰铢/人 ≈ ¥111（2人）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot" style="border-color:#30d158"></div>
+      <div class="tl-time">21:00</div>
+      <div class="tl-content">
+        <p class="tl-activity"><a class="ext-link" href="https://www.grab.com/th/" target="_blank" rel="noopener">Grab ↗</a> 返回酒店，养精蓄锐备战演唱会</p>
+        <span class="tl-cost">约150泰铢 ≈ ¥64</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day 3 timeline -->
+  <h3 class="reveal" style="font-size:20px;font-weight:600;margin:48px 0 20px;letter-spacing:-0.01em;color:#bf5af2">
+    Day 3 · 5月9日 — 🎤 演唱会日
+  </h3>
+  <div class="timeline">
+    <div class="tl-item reveal-left">
+      <div class="tl-dot" style="border-color:#bf5af2"></div>
+      <div class="tl-time">08:00–09:30</div>
+      <div class="tl-content"><p class="tl-activity">酒店悠闲早餐</p></div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot" style="border-color:#bf5af2"></div>
+      <div class="tl-time">10:00–12:30</div>
+      <div class="tl-content">
+        <p class="tl-activity">🛍️ <a class="ext-link" href="https://maps.apple.com/?q=Chatuchak+Weekend+Market&ll=13.7999,100.5501" target="_blank" rel="noopener">恰图恰市集（Chatuchak Market）↗</a>——5000+摊位</p>
+        <span class="tl-cost free">免费入场，小食约¥84（2人）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-left">
+      <div class="tl-dot" style="border-color:#bf5af2"></div>
+      <div class="tl-time">12:30–13:30</div>
+      <div class="tl-content">
+        <p class="tl-activity">🍜 午餐：<a class="ext-link" href="https://maps.apple.com/?q=Or+Tor+Kor+Market&ll=13.8032,100.5523" target="_blank" rel="noopener">Or Tor Kor 高档农贸市场 ↗</a></p>
+        <span class="tl-cost">约150泰铢/人 ≈ ¥127（2人）</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot" style="border-color:#bf5af2"></div>
+      <div class="tl-time">13:30–15:30</div>
+      <div class="tl-content">
+        <p class="tl-activity">☕ 曼谷网红咖啡馆 + 购买演唱会应援物</p>
+        <span class="tl-cost">咖啡¥84；纪念品按需</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-left">
+      <div class="tl-dot" style="border-color:#bf5af2"></div>
+      <div class="tl-time">15:30–17:00</div>
+      <div class="tl-content"><p class="tl-activity">返回酒店换演唱会服装</p></div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot" style="border-color:#bf5af2"></div>
+      <div class="tl-time">17:00–18:00</div>
+      <div class="tl-content">
+        <p class="tl-activity">BTS / <a class="ext-link" href="https://www.grab.com/th/" target="_blank" rel="noopener">Grab ↗</a> 前往演唱会场馆</p>
+        <span class="tl-cost">约150泰铢 ≈ ¥64</span>
+      </div>
+    </div>
+    <div class="tl-item reveal-left">
+      <div class="tl-dot" style="border-color:#bf5af2"></div>
+      <div class="tl-time">19:30 起</div>
+      <div class="tl-content">
+        <p class="tl-activity" style="color:#bf5af2;font-weight:700">🎤 赵露思演唱会！全场应援！</p>
+      </div>
+    </div>
+    <div class="tl-item reveal-right">
+      <div class="tl-dot" style="border-color:#bf5af2"></div>
+      <div class="tl-time">演出结束</div>
+      <div class="tl-content">
+        <p class="tl-activity">BTS（末班23:30）/ <a class="ext-link" href="https://www.grab.com/th/" target="_blank" rel="noopener">Grab ↗</a> 返回酒店</p>
+        <span class="tl-cost">约150泰铢 ≈ ¥64</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     出发前准备
+══════════════════════════════════════ -->
+<div class="section-divider"></div>
+<section id="prepare">
+  <p class="section-label reveal">行前必读</p>
+  <h2 class="section-title reveal">出发前准备</h2>
+  <p class="section-desc reveal">签证、保险、通信、货币，一次搞定。</p>
+
+  <div class="info-grid">
+    <div class="info-card reveal reveal-delay-1">
+      <div class="info-card-icon">🛂</div>
+      <h3 class="info-card-title">签证 · 免签！</h3>
+      <p class="info-card-body">泰国对中国公民实施免签（2025年有效），停留30天内无需签证。持有效护照直接入境。<br><br><strong style="color:#ffd60a">⚠️ 护照有效期须距出行日期6个月以上</strong></p>
+    </div>
+    <div class="info-card reveal reveal-delay-2">
+      <div class="info-card-icon">🛡️</div>
+      <h3 class="info-card-title">旅行保险</h3>
+      <p class="info-card-body">推荐<a class="ext-link" href="https://www.zhongan.com" target="_blank" rel="noopener"><strong>众安"全球无忧" ↗</strong></a>或<a class="ext-link" href="https://vacations.ctrip.com/insurance/" target="_blank" rel="noopener">携程旅行险 ↗</a>。3天综合险约 <strong style="color:#30d158">¥80/人</strong>，2人合计约¥160。<br><br>含境外医疗≥50万 · 航班延误 · 演唱会取消险</p>
+    </div>
+    <div class="info-card reveal reveal-delay-3">
+      <div class="info-card-icon">📱</div>
+      <h3 class="info-card-title">通信 · AIS SIM</h3>
+      <p class="info-card-body">抵达廊曼机场即可在 <a class="ext-link" href="https://www.ais.th/traveler/" target="_blank" rel="noopener"><strong>AIS 专柜 ↗</strong></a> 购买旅游SIM卡。<br><br>3天不限流量套餐：<strong style="color:#30d158">约100泰铢（¥21）/张</strong>，含语音通话，全国覆盖。</p>
+    </div>
+    <div class="info-card reveal reveal-delay-4">
+      <div class="info-card-icon">💴</div>
+      <h3 class="info-card-title">货币 · 泰铢</h3>
+      <p class="info-card-body">建议出发前换取 <strong>3000泰铢/人（约¥638）</strong> 现金备用。<br><br>大商场 / 酒店均支持 Visa/MasterCard。机场ATM手续费较高，尽量少用。</p>
+    </div>
+  </div>
+
+  <div style="margin-top: 32px" class="reveal">
+    <h3 style="font-size:18px;font-weight:600;margin-bottom:16px">📦 行前打包清单</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+      <div class="tip-card">
+        <div class="tip-card-title">🪪 证件类</div>
+        <ul class="tip-list">
+          <li>护照（有效期6个月以上）</li>
+          <li>机票订单 + 酒店订单截图</li>
+          <li>旅行保险单</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-card-title">👕 衣物类（32–35°C 湿热）</div>
+        <ul class="tip-list">
+          <li>轻薄短袖短裤 3–4套</li>
+          <li>泳衣（Day 2 珊瑚岛必备）</li>
+          <li>薄外套（室内冷气超强）</li>
+          <li>演唱会应援服装</li>
+          <li>防晒帽 + 太阳镜</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-card-title">🧴 日用品</div>
+        <ul class="tip-list">
+          <li>防晒霜 SPF50+</li>
+          <li>防蚊液（5月雨季蚊虫多）</li>
+          <li>肠胃药 / 感冒药</li>
+          <li>充电宝 10000mAh+</li>
+          <li>折叠雨伞 + 防水袋</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-card-title">🎤 演唱会专用</div>
+        <ul class="tip-list">
+          <li>演唱会票（电子版 + PDF备份）</li>
+          <li>应援棒 / 荧光棒</li>
+          <li>小腰包（轻装上阵）</li>
+          <li>耳塞（保护听力）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     机票
+══════════════════════════════════════ -->
+<div class="section-divider"></div>
+<section id="flight">
+  <p class="section-label reveal">性价比最优方案</p>
+  <h2 class="section-title reveal">机票</h2>
+  <p class="section-desc reveal">亚洲航空廉价直飞，提前购票最划算。</p>
+
+  <div class="big-card reveal">
+    <div>
+      <p class="big-card-label">推荐航司</p>
+      <h3 class="big-card-name"><a class="ext-link" href="https://www.airasia.com" target="_blank" rel="noopener">亚洲航空<br>AirAsia ↗</a></h3>
+      <p class="big-card-desc">广州白云（CAN）⇄ 曼谷廊曼（DMK）直飞，提前1–2个月购票性价比最高。</p>
+      <div style="margin-bottom:8px">
+        <div class="price-badge">
+          <span class="price-num">¥700</span>
+          <span class="price-unit">/ 人（往返）</span>
+        </div>
+        <p class="price-sub">含20kg 托运行李 · 2人合计约 ¥1,400</p>
+      </div>
+      <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap">
+        <span class="chip chip-blue">✈ 直飞 ~3小时</span>
+        <span class="chip chip-green">含托运行李</span>
+        <span class="chip chip-gold">越早越便宜</span>
+      </div>
+    </div>
+    <div class="kv-list">
+      <div class="kv-item">
+        <span class="kv-key">去程</span>
+        <span class="kv-val">CAN → DMK<br><small style="color:var(--muted)">5月7日 凌晨出发</small></span>
+      </div>
+      <div class="kv-item">
+        <span class="kv-key">抵达</span>
+        <span class="kv-val">约 05:00–06:00<br><small style="color:var(--muted)">当地时间</small></span>
+      </div>
+      <div class="kv-item">
+        <span class="kv-key">返程</span>
+        <span class="kv-val">DMK → CAN<br><small style="color:var(--muted)">5月10日 凌晨出发</small></span>
+      </div>
+      <div class="kv-item">
+        <span class="kv-key">购票渠道</span>
+        <span class="kv-val">
+          <a class="ext-link" href="https://www.airasia.com" target="_blank" rel="noopener">AirAsia官网</a> ·
+          <a class="ext-link" href="https://www.fliggy.com" target="_blank" rel="noopener">飞猪</a> ·
+          <a class="ext-link" href="https://flights.ctrip.com" target="_blank" rel="noopener">携程</a>
+        </span>
+      </div>
+      <div class="kv-item" style="padding-top:8px;border-top:1px solid var(--border)">
+        <span class="kv-key">廊曼→市区</span>
+        <span class="kv-val">A1巴士 30泰铢/人<br>或 Grab 约200泰铢</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     酒店
+══════════════════════════════════════ -->
+<div class="section-divider"></div>
+<section id="hotel">
+  <p class="section-label reveal">性价比最优方案</p>
+  <h2 class="section-title reveal">酒店</h2>
+  <p class="section-desc reveal">BTS 沿线，交通最便利，品牌稳定有保障。</p>
+
+  <div class="big-card reveal">
+    <div>
+      <p class="big-card-label">推荐酒店</p>
+      <h3 class="big-card-name"><a class="ext-link" href="https://www.agoda.com/en-gb/ibis-bangkok-sukhumvit-4/hotel/bangkok-th.html" target="_blank" rel="noopener">ibis Bangkok<br>Sukhumvit 4 ↗</a></h3>
+      <p class="big-card-desc">曼谷黄金地段素坤逸路，BTS Asok 站步行5分钟，周边便利店餐厅林立，出行极方便。</p>
+      <div style="margin-bottom:8px">
+        <div class="price-badge">
+          <span class="price-num">¥400</span>
+          <span class="price-unit">/ 间 / 晚</span>
+        </div>
+        <p class="price-sub">2晚合计约 ¥800 · 标准双人间</p>
+      </div>
+      <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap">
+        <span class="chip chip-blue">BTS步行5分钟</span>
+        <span class="chip chip-green">Booking 7.8/10</span>
+        <span class="chip chip-purple">品牌保障</span>
+      </div>
+    </div>
+    <div class="kv-list">
+      <div class="kv-item">
+        <span class="kv-key">房型</span>
+        <span class="kv-val">标准双人间（双床/大床可选）</span>
+      </div>
+      <div class="kv-item">
+        <span class="kv-key">设施</span>
+        <span class="kv-val">免费WiFi · 空调 · 独立卫浴<br><small style="color:var(--muted)">部分楼层含泳池</small></span>
+      </div>
+      <div class="kv-item">
+        <span class="kv-key">入住</span>
+        <span class="kv-val">5月7日<br><small style="color:var(--muted)">凌晨到达可先行李寄存，14:00入住</small></span>
+      </div>
+      <div class="kv-item">
+        <span class="kv-key">退房</span>
+        <span class="kv-val">5月10日<br><small style="color:var(--muted)">凌晨出发，提前沟通寄存行李</small></span>
+      </div>
+      <div class="kv-item">
+        <span class="kv-key">预订渠道</span>
+        <span class="kv-val">
+          <a class="ext-link" href="https://www.agoda.com/en-gb/ibis-bangkok-sukhumvit-4/hotel/bangkok-th.html" target="_blank" rel="noopener">Agoda（价格最低）</a> ·
+          <a class="ext-link" href="https://hotels.ctrip.com" target="_blank" rel="noopener">携程</a> ·
+          <a class="ext-link" href="https://www.booking.com/hotel/th/ibis-bangkok-sukhumvit-4.html" target="_blank" rel="noopener">Booking</a>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     餐饮
+══════════════════════════════════════ -->
+<div class="section-divider"></div>
+<section id="food">
+  <p class="section-label reveal">美食指南</p>
+  <h2 class="section-title reveal">餐饮推荐</h2>
+  <p class="section-desc reveal">泰国必吃清单，每份标好价格，人均¥20起。</p>
+
+  <div class="food-grid">
+    <a class="ext-link-card" href="https://maps.apple.com/?q=Pad+Thai+Bangkok" target="_blank" rel="noopener">
+    <div class="food-card reveal reveal-delay-1">
+      <p class="food-name">泰式炒河粉 ↗</p>
+      <p class="food-desc">Pad Thai · 最经典街头主食，香而不腻</p>
+      <p class="food-price">80泰铢 ≈ ¥17</p>
+    </div></a>
+    <a class="ext-link-card" href="https://maps.apple.com/?q=Tom+Yum+Goong+Bangkok" target="_blank" rel="noopener">
+    <div class="food-card reveal reveal-delay-2">
+      <p class="food-name">冬阴功汤 ↗</p>
+      <p class="food-desc">Tom Yum Goong · 酸辣鲜美，泰国国民汤</p>
+      <p class="food-price">200泰铢 ≈ ¥43</p>
+    </div></a>
+    <a class="ext-link-card" href="https://maps.apple.com/?q=Green+Curry+Bangkok" target="_blank" rel="noopener">
+    <div class="food-card reveal reveal-delay-3">
+      <p class="food-name">绿咖喱鸡饭 ↗</p>
+      <p class="food-desc">Green Curry · 椰香咖喱，下饭神器</p>
+      <p class="food-price">150泰铢 ≈ ¥32</p>
+    </div></a>
+    <a class="ext-link-card" href="https://maps.apple.com/?q=Mango+Sticky+Rice+Bangkok" target="_blank" rel="noopener">
+    <div class="food-card reveal reveal-delay-4">
+      <p class="food-name">芒果糯米饭 ↗</p>
+      <p class="food-desc">Mango Sticky Rice · 甜品界神作，必吃</p>
+      <p class="food-price">100泰铢 ≈ ¥21</p>
+    </div></a>
+    <a class="ext-link-card" href="https://maps.apple.com/?q=Thai+Tea+Bangkok" target="_blank" rel="noopener">
+    <div class="food-card reveal reveal-delay-1">
+      <p class="food-name">泰式奶茶 ↗</p>
+      <p class="food-desc">Thai Tea · 橙色奶茶，街头随处可见</p>
+      <p class="food-price">40泰铢 ≈ ¥9</p>
+    </div></a>
+    <a class="ext-link-card" href="https://maps.apple.com/?q=Boat+Noodles+Bangkok" target="_blank" rel="noopener">
+    <div class="food-card reveal reveal-delay-2">
+      <p class="food-name">曼谷船面 ↗</p>
+      <p class="food-desc">Boat Noodles · 特色小碗浓汤面，一碗不够</p>
+      <p class="food-price">50泰铢/碗 ≈ ¥11</p>
+    </div></a>
+    <a class="ext-link-card" href="https://maps.apple.com/?q=Pattaya+Seafood+Restaurant&ll=12.9297,100.8774" target="_blank" rel="noopener">
+    <div class="food-card reveal reveal-delay-3">
+      <p class="food-name">芭提雅海鲜 ↗</p>
+      <p class="food-desc">新鲜烤海鲜按斤计价，Day 2 当地大排档</p>
+      <p class="food-price">约400泰铢/人 ≈ ¥85</p>
+    </div></a>
+    <a class="ext-link-card" href="https://www.7-eleven.com.th" target="_blank" rel="noopener">
+    <div class="food-card reveal reveal-delay-4">
+      <p class="food-name">7-11 宵夜 ↗</p>
+      <p class="food-desc">演唱会后深夜，全天24小时，任何时间都开</p>
+      <p class="food-price">60泰铢 ≈ ¥13</p>
+    </div></a>
+  </div>
+
+  <div style="margin-top:32px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px" class="reveal">
+    <h3 style="font-size:16px;font-weight:600;margin-bottom:16px">🍽️ 推荐餐厅</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;font-size:14px">
+      <div><a class="ext-link" href="https://maps.apple.com/?q=Pad+Thai+Fawng+Bangkok&ll=13.7524,100.4972" target="_blank" rel="noopener"><strong>Pad Thai Fawng ↗</strong></a><br><span style="color:var(--muted)">最正宗炒河粉 · 人均100泰铢（¥21）</span></div>
+      <div><a class="ext-link" href="https://maps.apple.com/?q=MBK+Center+Bangkok&ll=13.7450,100.5297" target="_blank" rel="noopener"><strong>MBK Food Island ↗</strong></a><br><span style="color:var(--muted)">经济美食广场 · 人均100泰铢（¥21）</span></div>
+      <div><a class="ext-link" href="https://maps.apple.com/?q=Or+Tor+Kor+Market&ll=13.8032,100.5523" target="_blank" rel="noopener"><strong>Or Tor Kor Market ↗</strong></a><br><span style="color:var(--muted)">高档农贸市场 · 人均150泰铢（¥32）</span></div>
+      <div><a class="ext-link" href="https://maps.apple.com/?q=Asiatique+The+Riverfront&ll=13.7197,100.5098" target="_blank" rel="noopener"><strong>Asiatique 河畔夜市 ↗</strong></a><br><span style="color:var(--muted)">夜景+美食 · 人均250泰铢（¥53）</span></div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-top:16px">💬 点餐时说"<strong style="color:var(--text)">Mai Phet</strong>"= 不辣 · 不要直接喝生水，买瓶装水（约15泰铢）</p>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     景点与活动
+══════════════════════════════════════ -->
+<div class="section-divider"></div>
+<section id="attractions">
+  <p class="section-label reveal">以海景为主</p>
+  <h2 class="section-title reveal">景点与活动</h2>
+  <p class="section-desc reveal">本次行程大幅减少寺庙，以自然风光和海景为主。</p>
+
+  <div class="info-grid">
+    <a class="ext-link-card" href="https://maps.apple.com/?q=Lumphini+Park&ll=13.7305,100.5419" target="_blank" rel="noopener">
+    <div class="info-card reveal reveal-delay-1" style="border-color:rgba(0,113,227,0.3)">
+      <div class="info-card-icon">🌿</div>
+      <h3 class="info-card-title">伦披尼公园 ↗</h3>
+      <p class="info-card-body">曼谷最大城市绿肺，湖景 · 晨练 · 巨型蜥蜴出没，放松散步。</p>
+      <div style="margin-top:12px"><span class="chip chip-green">🆓 免费</span></div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.kingpowermahanakhon.co.th" target="_blank" rel="noopener">
+    <div class="info-card reveal reveal-delay-2" style="border-color:rgba(191,90,242,0.3)">
+      <div class="info-card-icon">🌇</div>
+      <h3 class="info-card-title">Mahanakhon 天空栈道 ↗</h3>
+      <p class="info-card-body">78层玻璃地板观景台，俯瞰整个曼谷，日落时分最美，拍照必打卡。</p>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <span class="chip chip-gold">875泰铢/人（¥186）</span>
+        <a class="open-btn" href="https://www.klook.com/en-US/activity/7028-king-power-mahanakhon-skywalk-bangkok/" target="_blank" rel="noopener" style="margin-top:0;padding:5px 12px;font-size:12px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          Klook 购票 ↗
+        </a>
+        <a class="open-btn" href="https://www.kingpowermahanakhon.co.th/tickets" target="_blank" rel="noopener" style="margin-top:0;padding:5px 12px;font-size:12px">🎫 官网购票 ↗</a>
+      </div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.asiatiquethailand.com" target="_blank" rel="noopener">
+    <div class="info-card reveal reveal-delay-3" style="border-color:rgba(0,113,227,0.3)">
+      <div class="info-card-icon">🌊</div>
+      <h3 class="info-card-title">Asiatique 河畔夜市 ↗</h3>
+      <p class="info-card-body">湄南河畔户外夜市，摩天轮夜景，多国美食，气氛热闹。</p>
+      <div style="margin-top:12px"><span class="chip chip-green">🆓 免费入场</span></div>
+    </div></a>
+    <a class="ext-link-card" href="https://www.banyantree.com/thailand/bangkok/vertigo-and-moon-bar" target="_blank" rel="noopener">
+    <div class="info-card reveal reveal-delay-4" style="border-color:rgba(255,214,10,0.3)">
+      <div class="info-card-icon">🍹</div>
+      <h3 class="info-card-title">Vertigo Rooftop Bar ↗</h3>
+      <p class="info-card-body">Banyan Tree 61层，360°无遮挡曼谷夜景，点饮品即可入场。</p>
+      <div style="margin-top:12px"><span class="chip chip-gold">最低消费600泰铢/人（¥127）</span></div>
+    </div></a>
+    <a class="ext-link-card" href="https://maps.apple.com/?q=Koh+Larn+Coral+Island&ll=12.9088,100.7736" target="_blank" rel="noopener">
+    <div class="info-card reveal reveal-delay-1" style="border-color:rgba(48,209,88,0.3)">
+      <div class="info-card-icon">🏝️</div>
+      <h3 class="info-card-title">珊瑚岛（Koh Larn）↗</h3>
+      <p class="info-card-body">芭提雅最美海岛，白沙滩 · 碧蓝海水 · 浮潜看珊瑚鱼群，Day 2 全天重点！</p>
+      <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="chip chip-green">渡轮30泰铢/人（¥13）</span>
+        <span class="chip chip-gold">浮潜装备150泰铢（¥32）</span>
+        <a class="open-btn" href="https://www.klook.com/en-US/activity/11524-coral-island-day-trip-pattaya/" target="_blank" rel="noopener" style="margin-top:0;padding:5px 12px;font-size:12px">🎫 Klook 一日游套餐 ↗</a>
+      </div>
+    </div></a>
+    <a class="ext-link-card" href="https://maps.apple.com/?q=Pattaya+Beach&ll=12.9347,100.8824" target="_blank" rel="noopener">
+    <div class="info-card reveal reveal-delay-2" style="border-color:rgba(48,209,88,0.3)">
+      <div class="info-card-icon">🏖️</div>
+      <h3 class="info-card-title">芭提雅海滩 ↗</h3>
+      <p class="info-card-body">落日余晖，海边漫步，自然海景放松身心。</p>
+      <div style="margin-top:12px"><span class="chip chip-green">🆓 免费</span></div>
+    </div></a>
+    <a class="ext-link-card" href="https://maps.apple.com/?q=Chatuchak+Weekend+Market&ll=13.7999,100.5501" target="_blank" rel="noopener">
+    <div class="info-card reveal reveal-delay-3" style="border-color:rgba(191,90,242,0.3)">
+      <div class="info-card-icon">🛍️</div>
+      <h3 class="info-card-title">恰图恰市集 ↗</h3>
+      <p class="info-card-body">5000+摊位超大户外市集，特色手工艺品 · 服装 · 小食，气氛热闹。</p>
+      <div style="margin-top:12px"><span class="chip chip-green">🆓 免费入场</span></div>
+    </div></a>
+    <a class="ext-link-card" href="https://maps.apple.com/?q=Koh+Larn+Water+Sports&ll=12.9088,100.7736" target="_blank" rel="noopener">
+    <div class="info-card reveal reveal-delay-4">
+      <div class="info-card-icon">💡</div>
+      <h3 class="info-card-title">水上活动自选 ↗</h3>
+      <p class="info-card-body">珊瑚岛可选项目：<br>摩托艇 600泰铢/人（¥127）<br>香蕉船 200泰铢/人（¥43）<br>玻璃底船 100泰铢/人（¥21）</p>
+    </div></a>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     费用预算
+══════════════════════════════════════ -->
+<div class="section-divider"></div>
+<section id="budget">
+  <p class="section-label reveal">透明账单</p>
+  <h2 class="section-title reveal">费用预算汇总</h2>
+  <p class="section-desc reveal">2人出行全程明细，不含演唱会票。汇率：1人民币 ≈ 4.7泰铢。</p>
+
+  <h3 class="reveal" style="font-size:16px;font-weight:600;margin-bottom:12px;color:var(--muted)">固定费用（出发前预订）</h3>
+  <div class="budget-table-wrap reveal">
+    <table>
+      <thead>
+        <tr><th>项目</th><th>单价</th><th>2人合计</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>✈️ 机票（AirAsia 往返，含20kg托运）</td><td>¥700/人</td><td>¥1,400</td></tr>
+        <tr><td>🏨 酒店（ibis Sukhumvit，2晚）</td><td>¥400/晚</td><td>¥800</td></tr>
+        <tr><td>🛡️ 旅行保险（3天综合险）</td><td>¥80/人</td><td>¥160</td></tr>
+        <tr class="row-total"><td colspan="2"><strong>固定费用小计</strong></td><td><strong>¥2,360</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="reveal" style="font-size:16px;font-weight:600;margin:32px 0 12px;color:var(--muted)">在泰日常花费（3天）</h3>
+  <div class="budget-table-wrap reveal">
+    <table>
+      <thead>
+        <tr><th>项目</th><th>备注</th><th>2人合计</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>📱 SIM卡 × 2</td><td>AIS 3天流量套餐</td><td>¥84</td></tr>
+        <tr><td>🚌 机场→酒店</td><td>A1巴士 + BTS</td><td>¥55</td></tr>
+        <tr><td>🌇 Day 1 景点门票（Mahanakhon）</td><td>875泰铢 × 2人</td><td>¥744</td></tr>
+        <tr><td>🍽️ Day 1 餐饮</td><td>早+午+晚</td><td>约¥500</td></tr>
+        <tr><td>🍹 Day 1 Rooftop Bar</td><td>600泰铢/人 × 2</td><td>约¥255</td></tr>
+        <tr><td>🚗 Day 1 打车 × 2次</td><td>Grab</td><td>¥84</td></tr>
+        <tr><td>🚌 Day 2 曼谷↔芭提雅大巴（往返）</td><td>131泰铢 × 2人 × 2程</td><td>¥222</td></tr>
+        <tr><td>🛺 Day 2 市区↔码头</td><td>双程</td><td>¥84</td></tr>
+        <tr><td>🚢 Day 2 渡轮往返 × 2人</td><td>30泰铢 × 2 × 2</td><td>¥50</td></tr>
+        <tr><td>🤿 Day 2 浮潜装备租借 × 2</td><td>150泰铢/人</td><td>¥64</td></tr>
+        <tr><td>🦞 Day 2 餐饮（含芭提雅海鲜）</td><td>早+午+晚</td><td>约¥600</td></tr>
+        <tr><td>🍜 Day 3 餐饮</td><td>早+午+咖啡+宵夜</td><td>约¥350</td></tr>
+        <tr><td>🚗 Day 3 打车 × 2次</td><td>Grab</td><td>¥84</td></tr>
+        <tr><td>🚗 离境打车至机场</td><td>Grab</td><td>¥84</td></tr>
+        <tr><td>🛍️ 购物/纪念品/伴手礼</td><td>按个人</td><td>约¥500</td></tr>
+        <tr><td>🎤 演唱会周边</td><td>约700泰铢/人</td><td>约¥300</td></tr>
+        <tr><td>💊 应急备用金</td><td>—</td><td>¥300</td></tr>
+        <tr class="row-total"><td colspan="2"><strong>在泰花费小计</strong></td><td><strong>约¥4,615</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="budget-summary">
+    <div class="budget-item reveal reveal-delay-1">
+      <div class="budget-item-emoji">✈️</div>
+      <div class="budget-item-label">机票（2人）</div>
+      <div class="budget-item-val"><span class="count-num" data-target="1400">0</span></div>
+    </div>
+    <div class="budget-item reveal reveal-delay-2">
+      <div class="budget-item-emoji">🏨</div>
+      <div class="budget-item-label">酒店 2晚（2人）</div>
+      <div class="budget-item-val"><span class="count-num" data-target="800">0</span></div>
+    </div>
+    <div class="budget-item reveal reveal-delay-3">
+      <div class="budget-item-emoji">🌴</div>
+      <div class="budget-item-label">在泰花费</div>
+      <div class="budget-item-val"><span class="count-num" data-target="4615">0</span></div>
+    </div>
+    <div class="budget-item reveal reveal-delay-4" style="border-color:rgba(48,209,88,0.3)">
+      <div class="budget-item-emoji">📊</div>
+      <div class="budget-item-label">总计（2人，不含演唱会票）</div>
+      <div class="budget-item-val" style="color:var(--teal)">¥<span class="count-num" data-target="6975">0</span></div>
+    </div>
+    <div class="budget-item reveal reveal-delay-5">
+      <div class="budget-item-emoji">👤</div>
+      <div class="budget-item-label">人均（不含演唱会票）</div>
+      <div class="budget-item-val">¥<span class="count-num" data-target="3488">0</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px;padding:20px 24px;background:rgba(48,209,88,0.08);border:1px solid rgba(48,209,88,0.2);border-radius:var(--radius)" class="reveal">
+    <p style="font-size:15px;color:var(--teal);font-weight:600">💡 含演唱会票总预算</p>
+    <p style="font-size:14px;color:var(--muted);margin-top:6px">演唱会票约¥800–2000/人，2人总预算约 <strong style="color:var(--text)">¥8,600–11,000</strong>，中等偏低消费，性价比高。</p>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     注意事项
+══════════════════════════════════════ -->
+<div class="section-divider"></div>
+<section id="tips">
+  <p class="section-label reveal">必知内容</p>
+  <h2 class="section-title reveal">注意事项 &amp; 实用贴士</h2>
+  <p class="section-desc reveal">安全 · 健康 · 交通 · 文化礼仪，出发前务必了解。</p>
+
+  <div class="tip-grid">
+    <div class="tip-card reveal reveal-delay-1">
+      <div class="tip-card-title">🚨 安全</div>
+      <ul class="tip-list">
+        <li>包朝前背，人流密集处防扒手</li>
+        <li>打车统一用 <a class="ext-link" href="https://www.grab.com/th/" target="_blank" rel="noopener"><strong style="color:var(--text)">Grab APP ↗</strong></a>，价格透明不被宰</li>
+        <li>非必要不租摩托车，事故率高</li>
+        <li>珊瑚岛5月有浪，不会游泳请穿救生衣</li>
+        <li>不要直接饮用生水</li>
+      </ul>
+    </div>
+    <div class="tip-card reveal reveal-delay-2">
+      <div class="tip-card-title">💚 健康</div>
+      <ul class="tip-list">
+        <li>5月雨季蚊虫多，涂防蚊液防登革热</li>
+        <li>紫外线极强，每2小时补涂防晒</li>
+        <li>多喝水，避开正午12–14点强烈户外活动</li>
+        <li>去珊瑚岛如晕船，提前服晕车药</li>
+      </ul>
+    </div>
+    <div class="tip-card reveal reveal-delay-3">
+      <div class="tip-card-title">🚌 交通</div>
+      <ul class="tip-list">
+        <li>Grab：最推荐，价格固定有中文界面</li>
+        <li>BTS空铁：25–65泰铢/次，覆盖主要商圈</li>
+        <li>A1巴士：廊曼机场↔Mo Chit，30泰铢/人</li>
+        <li>嘟嘟车：体验感强，短途砍价后约50–100泰铢</li>
+      </ul>
+    </div>
+    <div class="tip-card reveal reveal-delay-4">
+      <div class="tip-card-title">🙏 文化礼仪</div>
+      <ul class="tip-list">
+        <li>泰国法律严禁侮辱皇室，任何相关言论须非常谨慎</li>
+        <li>合十礼（双掌合十）是标准问候方式，可回礼</li>
+        <li>不要用脚指人或踢东西</li>
+      </ul>
+    </div>
+    <div class="tip-card reveal reveal-delay-1">
+      <div class="tip-card-title">☀️ 气候穿搭</div>
+      <ul class="tip-list">
+        <li>5月曼谷：32–35°C，高湿热，体感更热</li>
+        <li>每天午后有阵雨，带折叠伞，雨停很快</li>
+        <li>室内冷气超强（18–20°C），随身带薄外套</li>
+        <li>珊瑚岛出海穿防晒衣+泳衣</li>
+      </ul>
+    </div>
+    <div class="tip-card reveal reveal-delay-2">
+      <div class="tip-card-title">📱 必备APP</div>
+      <ul class="tip-list">
+        <li><a class="ext-link" href="https://www.grab.com/th/" target="_blank" rel="noopener"><strong style="color:var(--text)">Grab ↗</strong></a> — 打车/外卖，必装</li>
+        <li><a class="ext-link" href="https://maps.apple.com" target="_blank" rel="noopener"><strong style="color:var(--text)">Google Maps ↗</strong></a> — 导航+BTS路线</li>
+        <li><a class="ext-link" href="https://translate.google.com" target="_blank" rel="noopener"><strong style="color:var(--text)">Google翻译 ↗</strong></a> — 中泰互译，下载离线包</li>
+        <li><a class="ext-link" href="https://www.xe.com" target="_blank" rel="noopener"><strong style="color:var(--text)">XE Currency ↗</strong></a> — 实时汇率</li>
+        <li><a class="ext-link" href="https://www.agoda.com" target="_blank" rel="noopener"><strong style="color:var(--text)">Agoda ↗</strong></a> — 东南亚最优惠订酒店</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="margin-top:32px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px" class="reveal">
+    <h3 style="font-size:16px;font-weight:600;margin-bottom:16px">🗣️ 常用泰语</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;font-size:14px">
+      <div><strong>Sa-wat-dee</strong><br><span style="color:var(--muted)">你好 · 日常问候</span></div>
+      <div><strong>Khob-khun</strong><br><span style="color:var(--muted)">谢谢 · 表示感谢</span></div>
+      <div><strong>Mai phet</strong><br><span style="color:var(--muted)">不辣 · 点餐时说</span></div>
+      <div><strong>Tao-rai</strong><br><span style="color:var(--muted)">多少钱 · 购物</span></div>
+      <div><strong>Phaeng pai</strong><br><span style="color:var(--muted)">太贵了 · 砍价</span></div>
+      <div><strong>Hong-nam yoo-tee-nai</strong><br><span style="color:var(--muted)">厕所在哪 · 问路</span></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     演唱会
+══════════════════════════════════════ -->
+<div class="section-divider"></div>
+<section id="concert">
+  <p class="section-label reveal">重头戏</p>
+  <h2 class="section-title reveal">演唱会专项提示</h2>
+  <p class="section-desc reveal">Day 3 · 5月9日周五 · 赵露思 Bangkok 演唱会</p>
+
+  <div class="concert-hero reveal">
+    <h2 class="concert-title">赵露思演唱会<br>Bangkok 2025 🎤</h2>
+    <p class="concert-date">5月9日 周五 · 19:30 起 · 曼谷演唱会场馆</p>
+    <div class="checklist">
+      <div class="check-item"><div class="check-box">□</div>演唱会票（截图 + PDF 双备份）</div>
+      <div class="check-item"><div class="check-box">□</div>护照（部分场馆需验身份）</div>
+      <div class="check-item"><div class="check-box">□</div>应援棒 / 荧光棒</div>
+      <div class="check-item"><div class="check-box">□</div>充电宝 10000mAh</div>
+      <div class="check-item"><div class="check-box">□</div>耳塞（保护听力）</div>
+      <div class="check-item"><div class="check-box">□</div>薄外套（室内冷气强）</div>
+      <div class="check-item"><div class="check-box">□</div>小腰包（轻装上阵）</div>
+    </div>
+  </div>
+
+  <div class="info-grid" style="margin-top:32px">
+    <div class="info-card reveal reveal-delay-1">
+      <div class="info-card-icon">🎫</div>
+      <h3 class="info-card-title">票务</h3>
+      <p class="info-card-body">关注赵露思官方账号 + 演唱会主办方官网购票。<br><br>二手票：<a class="ext-link" href="https://www.damai.cn" target="_blank" rel="noopener">大麦网 ↗</a> / <a class="ext-link" href="https://www.motianlun.com" target="_blank" rel="noopener">摩天轮票务 ↗</a> / <a class="ext-link" href="https://www.stubhub.com" target="_blank" rel="noopener">StubHub ↗</a>，注意防诈骗。<br><br>提前截图保存，同时下载PDF备用。</p>
+    </div>
+    <div class="info-card reveal reveal-delay-2">
+      <div class="info-card-icon">⏰</div>
+      <h3 class="info-card-title">到场时间</h3>
+      <p class="info-card-body">建议提前 <strong style="color:#bf5af2">1.5–2 小时</strong>到达场馆，避免排队过久错过开场。<br><br>17:00出发 → 18:00到场馆门口拍照 → 19:30演出开始。</p>
+    </div>
+    <div class="info-card reveal reveal-delay-3">
+      <div class="info-card-icon">🔒</div>
+      <h3 class="info-card-title">场馆规定</h3>
+      <p class="info-card-body"><span style="color:var(--red)">禁止：</span>专业相机（长焦）、自拍杆<br><br><span style="color:var(--teal)">可带：</span>手机、充电宝、应援道具（无激光无强闪光）<br><br>提前在主办方官网确认具体规定。</p>
+    </div>
+    <div class="info-card reveal reveal-delay-4">
+      <div class="info-card-icon">🚇</div>
+      <h3 class="info-card-title">散场回酒店</h3>
+      <p class="info-card-body">BTS 末班车约 <strong style="color:var(--text)">23:30</strong>，超过需打 Grab。<br><br>散场时等人潮稍散再走，避免拥挤。<br><br>提前规划好路线，与同伴开启微信位置共享。</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     路线地图
+══════════════════════════════════════ -->
+<div class="section-divider"></div>
+<section id="routemap">
+  <p class="section-label reveal">路线一览</p>
+  <h2 class="section-title reveal">旅途路线地图</h2>
+  <p class="section-desc reveal">动画演示完整行程路线，带你从广州一路走到曼谷、芭提雅再到演唱会。</p>
+
+  <div class="map-wrapper reveal">
+    <canvas id="routeCanvas"></canvas>
+    <div class="map-controls">
+      <div class="map-legend">
+        <span class="leg-item"><span class="leg-line leg-line-dash" style="--c:#0071e3"></span>✈ 航班</span>
+        <span class="leg-item"><span class="leg-line leg-line-solid" style="--c:#30d158"></span>🚌 陆路</span>
+        <span class="leg-item"><span class="leg-line leg-line-dot" style="--c:#5ac8fa"></span>🚢 水路</span>
+        <span class="leg-item"><span class="leg-line leg-line-solid" style="--c:#bf5af2"></span>🎤 演唱会日</span>
+        <span class="leg-item"><span class="leg-line leg-line-dash" style="--c:#ffd60a"></span>🛫 返程</span>
+      </div>
+      <button class="open-btn" id="mapReplayBtn">▶ 重新播放</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<div class="section-divider"></div>
+<footer>
+  <p style="font-size:24px;margin-bottom:12px">🎤 🏝️ ✈️</p>
+  <p><strong>祝旅途愉快，珊瑚岛尽兴，赵露思演唱会精彩！</strong></p>
+  <p style="margin-top:12px">本方案更新时间：2025年4月 · 价格仅供参考，以实际出行时为准</p>
+  <p>政策可能变更，出发前请以官方最新信息为准</p>
+</footer>
+
+
+<script>
+  // ── Scroll progress bar ──
+  const progressBar = document.getElementById('progress-bar');
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docH = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (docH > 0 ? (scrollTop / docH) * 100 : 0) + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+
+  // ── Smooth scroll on nav button click ──
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.target;
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // ── Active nav button on scroll ──
+  const sections = ['itinerary','prepare','flight','hotel','food','attractions','budget','tips','concert','routemap'];
+  const navButtons = document.querySelectorAll('.nav-btn');
+  const NAV_H = 52 + 20;
+
+  function updateActive() {
+    let current = '';
+    for (const id of sections) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      if (el.getBoundingClientRect().top <= NAV_H + 40) current = id;
+    }
+    navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.target === current));
+  }
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+
+  // ── Scroll-triggered reveal (all variants) ──
+  const allReveal = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
+  allReveal.forEach(el => revealObserver.observe(el));
+
+  // ── Count-up animation ──
+  function animateCount(el, target, duration) {
+    const start = performance.now();
+    function step(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const val = Math.round(eased * target);
+      el.textContent = val.toLocaleString('zh-CN');
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  const countObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const target = parseInt(entry.target.dataset.target, 10);
+        animateCount(entry.target, target, 1400);
+        countObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.count-num').forEach(el => countObserver.observe(el));
+
+  // ── Parallax hero bg on scroll ──
+  const heroBg = document.querySelector('.hero-bg');
+  window.addEventListener('scroll', () => {
+    if (heroBg) heroBg.style.transform = `translateY(${window.scrollY * 0.3}px)`;
+  }, { passive: true });
+
+  // ── Nav blur changes on scroll ──
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.style.background = window.scrollY > 60
+      ? 'rgba(0,0,0,0.88)'
+      : 'rgba(0,0,0,0.72)';
+  }, { passive: true });
+
+  // ── Hero mouse parallax ──
+  const heroSection = document.getElementById('hero');
+  const heroTitle   = heroSection.querySelector('.hero-title');
+  const heroSub     = heroSection.querySelector('.hero-sub');
+  heroSection.addEventListener('mousemove', (e) => {
+    const cx = heroSection.clientWidth  / 2;
+    const cy = heroSection.clientHeight / 2;
+    const dx = (e.clientX - cx) / cx;
+    const dy = (e.clientY - cy) / cy;
+    if (heroTitle) heroTitle.style.transform = `translate(${dx * 10}px, ${dy * 6}px)`;
+    if (heroSub)   heroSub.style.transform   = `translate(${dx * 5}px,  ${dy * 3}px)`;
+  });
+  heroSection.addEventListener('mouseleave', () => {
+    if (heroTitle) heroTitle.style.transform = '';
+    if (heroSub)   heroSub.style.transform   = '';
+  });
+
+  // ── Generate floating particles ──
+  (function spawnParticles() {
+    const container = document.getElementById('particles');
+    if (!container) return;
+    const COLORS = ['rgba(0,113,227,0.6)','rgba(191,90,242,0.5)','rgba(48,209,88,0.4)','rgba(255,214,10,0.35)'];
+    for (let i = 0; i < 28; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = 3 + Math.random() * 6;
+      p.style.cssText = [
+        `width:${size}px`, `height:${size}px`,
+        `left:${Math.random() * 100}%`,
+        `top:${60 + Math.random() * 40}%`,
+        `background:${COLORS[i % COLORS.length]}`,
+        `animation-duration:${8 + Math.random() * 14}s`,
+        `animation-delay:${Math.random() * 10}s`,
+        `filter:blur(${Math.random() < 0.4 ? 1 : 0}px)`
+      ].join(';');
+      container.appendChild(p);
+    }
+  })();
+
+  // ══════════════════════════════════════
+  // ROUTE MAP CANVAS ANIMATION
+  // ══════════════════════════════════════
+  (function initRouteMap() {
+    const canvas = document.getElementById('routeCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let W, H, dpr, animId, startTs;
+
+    // ── Responsive canvas setup ──
+    function setupCanvas() {
+      dpr = window.devicePixelRatio || 1;
+      const cw = canvas.parentElement.clientWidth;
+      H = Math.min(Math.round(cw * 0.56), 500);
+      W = cw;
+      canvas.width  = W * dpr;
+      canvas.height = H * dpr;
+      canvas.style.width  = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    setupCanvas();
+
+    // ── Geographic projection ──
+    // Bounds: lat 6°N – 25.5°N, lon 97°E – 116°E
+    const L0 = 6, L1 = 25.5, O0 = 97, O1 = 116;
+    function gp(lat, lon) {
+      return [(lon - O0) / (O1 - O0) * W, (1 - (lat - L0) / (L1 - L0)) * H];
+    }
+
+    // ── Simplified land polygons (lat, lon pairs) ──
+    // Thailand — clockwise from Bangkok coast south then back north
+    const TH = [
+      [13.0,100.9],[12.5,101.5],[12.0,102.0],[11.5,102.5],[10.5,103.5],
+      [9.5,101.5],[8.5,100.5],[7.5,100.5],[7.0,100.5],[6.3,100.3],
+      [6.5,99.8],[7.0,99.5],[7.5,98.5],[8.5,98.2],[10.0,98.5],
+      [11.0,98.5],[12.0,98.5],[13.0,99.0],[14.0,98.4],[15.0,98.5],
+      [16.0,98.5],[17.0,98.2],[18.0,98.4],[19.5,98.9],[20.5,97.7],
+      [20.0,99.5],[18.5,101.0],[18.0,103.5],[17.5,104.5],[16.0,104.5],
+      [14.5,104.5],[13.5,103.5],[13.0,103.0],[12.5,102.5],[13.0,100.9]
+    ];
+    // Myanmar (partial, W of Thailand)
+    const MM = [
+      [20.5,97.7],[20.0,97.5],[19.0,97.0],[17.5,97.0],[16.0,97.0],
+      [15.0,97.5],[14.0,98.4],[15.0,98.5],[16.0,98.5],[17.0,98.2],
+      [18.0,98.4],[19.5,98.9],[20.5,97.7]
+    ];
+    // Cambodia + Vietnam coast
+    const KV = [
+      [13.5,103.5],[14.5,104.5],[16.0,104.5],[17.5,104.5],[18.0,107.0],
+      [16.0,108.0],[13.0,109.0],[11.0,108.5],[10.0,105.0],[10.5,103.5],
+      [11.5,102.5],[12.0,102.0],[12.5,102.5],[13.0,103.0],[13.5,103.5]
+    ];
+    // Laos
+    const LA = [
+      [17.5,104.5],[18.5,101.0],[20.0,102.0],[22.5,103.0],
+      [22.5,106.5],[20.0,107.0],[18.0,107.0],[17.5,104.5]
+    ];
+    // Southern China / Guangdong
+    const CN = [
+      [21.5,108.0],[22.0,110.0],[22.5,113.5],[23.5,116.0],
+      [25.5,116.0],[25.5,108.0]
+    ];
+    // Hainan island
+    const HN = [[20.2,109.5],[20.2,111.2],[18.5,111.2],[18.5,109.5]];
+
+    function poly(pts, fill, stroke, lw) {
+      ctx.beginPath();
+      pts.forEach(([la, lo], i) => {
+        const [x, y] = gp(la, lo);
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+      if (fill)   { ctx.fillStyle = fill;   ctx.fill(); }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 0.5; ctx.stroke(); }
+    }
+
+    function drawBg() {
+      // Ocean
+      const gr = ctx.createLinearGradient(0, 0, 0, H);
+      gr.addColorStop(0, '#04091a');
+      gr.addColorStop(1, '#07112a');
+      ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H);
+
+      // Subtle lat/lon grid
+      ctx.strokeStyle = 'rgba(255,255,255,0.025)'; ctx.lineWidth = 0.5;
+      for (let la = 8; la < 25; la += 2) {
+        const [,y] = gp(la, O0);
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+      for (let lo = 98; lo < 116; lo += 2) {
+        const [x] = gp(L0, lo);
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      }
+
+      // Land
+      poly(MM, '#17202e', '#253050');
+      poly(TH, '#1c2d40', '#304060');
+      poly(LA, '#17202e', '#253050');
+      poly(KV, '#17202e', '#253050');
+      poly(CN, '#17202e', '#253050');
+      poly(HN, '#17202e', '#253050');
+
+      // Sea labels
+      const fs = Math.max(9, W / 95);
+      ctx.font = `italic ${fs}px Georgia, serif`;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(90,200,250,0.18)';
+      const [gx, gy] = gp(11.5, 101.5); ctx.fillText('Gulf of Thailand', gx, gy);
+      const [sx, sy] = gp(17, 113);     ctx.fillText('South China Sea', sx, sy);
+    }
+
+    // ── Route data ──
+    const STOPS = [
+      { name:'广州', sub:'Day 0 · 出发地', lat:23.39, lon:113.30, col:'#0071e3' },
+      { name:'廊曼机场', sub:'Day 1 · 清晨抵达', lat:13.91, lon:100.61, col:'#30d158' },
+      { name:'曼谷市区', sub:'Day 1 · 游览', lat:13.73, lon:100.50, col:'#5ac8fa' },
+      { name:'芭提雅', sub:'Day 2 · 海滩', lat:12.93, lon:100.88, col:'#30d158' },
+      { name:'珊瑚岛', sub:'Day 2 · 浮潜', lat:12.91, lon:100.75, col:'#30d158' },
+      { name:'恰图恰', sub:'Day 3 · 市集', lat:13.80, lon:100.55, col:'#bf5af2' },
+      { name:'演唱会', sub:'Day 3 · 19:30', lat:13.75, lon:100.56, col:'#bf5af2' },
+      { name:'返程广州', sub:'Day 4 · 返回', lat:23.39, lon:113.30, col:'#ffd60a' },
+    ];
+    const SEGS = [
+      { f:0, t:1, type:'flight', col:'#0071e3' },
+      { f:1, t:2, type:'ground', col:'#30d158' },
+      { f:2, t:3, type:'ground', col:'#5ac8fa' },
+      { f:3, t:4, type:'boat',   col:'#5ac8fa' },
+      { f:4, t:3, type:'boat',   col:'#5ac8fa' },
+      { f:3, t:2, type:'ground', col:'#5ac8fa' },
+      { f:2, t:5, type:'ground', col:'#bf5af2' },
+      { f:5, t:6, type:'ground', col:'#bf5af2' },
+      { f:2, t:7, type:'flight', col:'#ffd60a' },
+    ];
+    // Durations (ms) per segment
+    const DUR = [1800, 800, 1000, 600, 600, 800, 600, 500, 1800];
+
+    // Build arc/line point arrays
+    function arcPts(a, b, n = 60) {
+      const r = [];
+      const dlat = b.lat - a.lat, dlon = b.lon - a.lon;
+      const dist = Math.sqrt(dlat*dlat + dlon*dlon);
+      for (let i = 0; i <= n; i++) {
+        const t = i / n;
+        const bow = Math.sin(t * Math.PI) * dist * 0.14 * Math.sign(dlon || 1);
+        r.push(gp(a.lat + dlat * t, a.lon + dlon * t - bow));
+      }
+      return r;
+    }
+    function linePts(a, b, n = 20) {
+      const r = [];
+      for (let i = 0; i <= n; i++) {
+        const t = i / n;
+        r.push(gp(a.lat + (b.lat - a.lat) * t, a.lon + (b.lon - a.lon) * t));
+      }
+      return r;
+    }
+    const SPTS = SEGS.map(s => {
+      const a = STOPS[s.f], b = STOPS[s.t];
+      return s.type === 'flight' ? arcPts(a, b) : linePts(a, b);
+    });
+
+    // ── Timing plan ──
+    // phase 0 (0-600ms): bg draws in
+    // phase 1 (600ms + i*180ms): each stop dot appears
+    // phase 2 (after stops): segments animate one by one, 300ms pause between
+    const BG_END    = 600;
+    const STOP_DLY  = 180;
+    const STOP_END  = BG_END + STOPS.length * STOP_DLY;
+    const SEG_START = []; // absolute ms each segment begins
+    let t = STOP_END + 600;
+    for (let i = 0; i < SEGS.length; i++) { SEG_START.push(t); t += DUR[i] + 350; }
+    const TOTAL = t + 1500;
+
+    // ── Round-rect helper ──
+    function rrect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
+      ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+      ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
+      ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
+      ctx.closePath();
+    }
+
+    function drawMarker(s, alpha, pulse) {
+      if (alpha <= 0) return;
+      const [x, y] = gp(s.lat, s.lon);
+      const r = Math.max(5, W / 115);
+
+      // Pulse glow
+      if (pulse > 0) {
+        const pg = ctx.createRadialGradient(x, y, r, x, y, r * 3.5 + pulse * 7);
+        pg.addColorStop(0, s.col + '90'); pg.addColorStop(1, s.col + '00');
+        ctx.globalAlpha = alpha;
+        ctx.beginPath(); ctx.arc(x, y, r * 3.5 + pulse * 7, 0, Math.PI * 2);
+        ctx.fillStyle = pg; ctx.fill();
+      }
+      // Ring
+      ctx.globalAlpha = alpha * 0.3;
+      ctx.beginPath(); ctx.arc(x, y, r * 2, 0, Math.PI * 2);
+      ctx.fillStyle = s.col; ctx.fill();
+      // Dot
+      ctx.globalAlpha = alpha;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = s.col; ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Label
+      const fs = Math.max(9, W / 92);
+      ctx.font = `700 ${fs}px -apple-system, 'Helvetica Neue', sans-serif`;
+      const right = x > W * 0.72;
+      ctx.textAlign = right ? 'right' : 'left';
+      const lx = right ? x - r * 2.8 : x + r * 2.8;
+      const mw = Math.max(ctx.measureText(s.name).width, ctx.measureText(s.sub).width) + 12;
+      const mh = fs * 2.9;
+      const bx = right ? lx - mw : lx - 4;
+      const by = y - mh / 2;
+
+      ctx.globalAlpha = alpha * 0.88;
+      ctx.fillStyle = 'rgba(5,10,22,0.9)';
+      rrect(bx, by, mw, mh, 4); ctx.fill();
+      ctx.strokeStyle = s.col + '60';
+      ctx.lineWidth = 1;
+      rrect(bx, by, mw, mh, 4); ctx.stroke();
+
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#f5f5f7';
+      ctx.fillText(s.name, lx, y - fs * 0.05);
+      ctx.font = `${fs * 0.82}px -apple-system, 'Helvetica Neue', sans-serif`;
+      ctx.fillStyle = '#86868b';
+      ctx.fillText(s.sub, lx, y + fs * 1.08);
+      ctx.globalAlpha = 1;
+    }
+
+    function drawSeg(seg, pts, prog, done) {
+      const n = Math.max(2, Math.floor(prog * pts.length));
+      ctx.save();
+      ctx.lineWidth  = seg.type === 'flight' ? 2.2 : 1.8;
+      ctx.lineCap    = 'round';
+      ctx.lineJoin   = 'round';
+      ctx.strokeStyle = seg.col;
+      ctx.globalAlpha = 0.85;
+      ctx.setLineDash(seg.type === 'flight' ? [8, 4] : seg.type === 'boat' ? [4, 4] : []);
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < n; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // Moving glow dot at head
+      if (!done && n < pts.length) {
+        const [hx, hy] = pts[n - 1];
+        ctx.globalAlpha = 1;
+        ctx.beginPath(); ctx.arc(hx, hy, 5, 0, Math.PI * 2);
+        ctx.fillStyle = seg.col; ctx.fill();
+        const gg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 14);
+        gg.addColorStop(0, seg.col + '88'); gg.addColorStop(1, seg.col + '00');
+        ctx.beginPath(); ctx.arc(hx, hy, 14, 0, Math.PI * 2);
+        ctx.fillStyle = gg; ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // ── Render loop ──
+    function frame(ts) {
+      if (!startTs) startTs = ts;
+      const el = ts - startTs;
+      ctx.clearRect(0, 0, W, H);
+
+      // Fade-in bg
+      const bgA = Math.min(1, el / BG_END);
+      ctx.globalAlpha = bgA; drawBg(); ctx.globalAlpha = 1;
+
+      // Stop markers
+      for (let i = 0; i < STOPS.length; i++) {
+        const sT = BG_END + i * STOP_DLY;
+        const a = Math.min(1, Math.max(0, (el - sT) / 400));
+        const pulse = (i === 0 && el > sT && el < SEG_START[0] + 800)
+          ? Math.sin(el / 500) * 0.5 + 0.5 : 0;
+        drawMarker(STOPS[i], a, pulse);
+      }
+
+      // Segments
+      for (let si = 0; si < SEGS.length; si++) {
+        if (el < SEG_START[si]) break;
+        const prog = Math.min(1, (el - SEG_START[si]) / DUR[si]);
+        drawSeg(SEGS[si], SPTS[si], prog, prog >= 1);
+      }
+
+      if (el < TOTAL) {
+        animId = requestAnimationFrame(frame);
+      } else {
+        // Final frozen frame — redraw everything fully
+        ctx.clearRect(0, 0, W, H);
+        drawBg();
+        SEGS.forEach((seg, si) => drawSeg(seg, SPTS[si], 1, true));
+        STOPS.forEach(s => drawMarker(s, 1, 0));
+      }
+    }
+
+    function startAnim() {
+      cancelAnimationFrame(animId);
+      startTs = null;
+      animId = requestAnimationFrame(frame);
+    }
+
+    // Start when section scrolls into view
+    const section = document.getElementById('routemap');
+    let hasPlayed = false;
+    if (section) {
+      const io = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && !hasPlayed) {
+          hasPlayed = true;
+          setTimeout(startAnim, 300);
+        }
+      }, { threshold: 0.15 });
+      io.observe(section);
+    }
+
+    // Replay button
+    const replayBtn = document.getElementById('mapReplayBtn');
+    if (replayBtn) replayBtn.addEventListener('click', () => { hasPlayed = true; startAnim(); });
+
+    // Redraw on resize
+    window.addEventListener('resize', () => {
+      setupCanvas();
+      // Recompute projected points after resize
+      SEGS.forEach((s, i) => {
+        const a = STOPS[s.f], b = STOPS[s.t];
+        SPTS[i] = s.type === 'flight' ? arcPts(a, b) : linePts(a, b);
+      });
+      startAnim();
+    }, { passive: true });
+  })();
+</script>
+</body>
+</html>
