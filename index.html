@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🌏 和天真的泰国之旅</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
   <style>
     /* ─── Reset & Base ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -712,10 +713,59 @@
       border-radius: var(--radius);
       overflow: hidden;
     }
-    #routeCanvas {
-      display: block;
+    .amap-container {
       width: 100%;
+      height: 460px;
+      display: block;
+      background: #070d1c;
+      cursor: grab;
     }
+    .amap-container:active { cursor: grabbing; }
+    /* Invert tiles for dark mode (standard map → dark look) */
+    .amap-container .leaflet-layer,
+    .amap-container .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.82) contrast(1.05) saturate(0.9); }
+    /* Keep overlays unfiltered */
+    .amap-container .leaflet-marker-pane,
+    .amap-container .leaflet-overlay-pane,
+    .amap-container .leaflet-tooltip-pane,
+    .amap-container .leaflet-popup-pane,
+    .amap-container .leaflet-control-container { filter: none; }
+    .amap-container .leaflet-control-attribution {
+      background: rgba(0,0,0,0.55) !important;
+      color: #555 !important;
+      font-size: 10px;
+      backdrop-filter: blur(4px);
+    }
+    .amap-container .leaflet-control-attribution a { color: #666 !important; }
+    .amap-container .leaflet-control-zoom a {
+      background: rgba(15,20,40,0.9) !important;
+      color: #aaa !important;
+      border-color: rgba(255,255,255,0.1) !important;
+      backdrop-filter: blur(8px);
+    }
+    .amap-container .leaflet-control-zoom a:hover { color: #fff !important; background: rgba(30,40,70,0.95) !important; }
+    /* Custom marker dot */
+    .map-mk-dot {
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.75);
+      width: 12px; height: 12px;
+    }
+    /* Tooltip */
+    .leaflet-tooltip.map-tip {
+      background: rgba(5,10,25,0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #f5f5f7;
+      font-size: 12px;
+      border-radius: 9px;
+      padding: 6px 11px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      white-space: nowrap;
+    }
+    .leaflet-tooltip.map-tip::before { display: none; }
+    /* Fullscreen panel expansion */
+    .map-panel:fullscreen .amap-container,
+    .map-panel:-webkit-full-screen .amap-container { height: calc(100vh - 60px); }
     .map-controls {
       display: flex;
       align-items: center;
@@ -852,7 +902,7 @@
 <section id="hero" style="padding-top: var(--nav-h)">
   <div class="hero-bg"></div>
   <div id="particles"></div>
-  <p class="hero-tag">2025 · 广州 → 曼谷 + 芭提雅</p>
+  <p class="hero-tag">2026 · 广州 → 曼谷 + 芭提雅</p>
   <h1 class="hero-title">和天真的<br>泰国之旅</h1>
   <p class="hero-sub">5月7日 – 10日 · 2人 · 赵露思演唱会 · 珊瑚岛<br>白沙滩 · 河畔夜景 · 演唱会应援 · 最美回忆</p>
   <div class="hero-stats">
@@ -888,7 +938,7 @@
   <!-- Day 1 -->
   <div class="map-panel active" id="map-panel-1">
     <div class="map-wrapper reveal">
-      <canvas id="routeCanvas1"></canvas>
+      <div id="amap-day1" class="amap-container"></div>
       <div class="map-controls">
         <div class="map-legend">
           <span class="leg-item"><span class="leg-line leg-line-solid" style="--c:#5ac8fa"></span>BTS/地铁</span>
@@ -896,7 +946,7 @@
           <span class="leg-item"><span class="leg-line leg-line-solid" style="--c:#30d158"></span>步行景点</span>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <button class="open-btn" id="mapReplayBtn1">▶ 重新播放</button>
+          <button class="open-btn" id="mapReplayBtn1">📍 重置视图</button>
           <button class="fullscreen-btn" id="mapFullBtn1">⛶ 全屏</button>
         </div>
       </div>
@@ -906,7 +956,7 @@
   <!-- Day 2 -->
   <div class="map-panel" id="map-panel-2">
     <div class="map-wrapper">
-      <canvas id="routeCanvas2"></canvas>
+      <div id="amap-day2" class="amap-container"></div>
       <div class="map-controls">
         <div class="map-legend">
           <span class="leg-item"><span class="leg-line leg-line-solid" style="--c:#30d158"></span>陆路大巴</span>
@@ -914,7 +964,7 @@
           <span class="leg-item"><span class="leg-line leg-line-dot" style="--c:#0071e3"></span>Grab</span>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <button class="open-btn" id="mapReplayBtn2">▶ 重新播放</button>
+          <button class="open-btn" id="mapReplayBtn2">📍 重置视图</button>
           <button class="fullscreen-btn" id="mapFullBtn2">⛶ 全屏</button>
         </div>
       </div>
@@ -924,14 +974,14 @@
   <!-- Day 3 -->
   <div class="map-panel" id="map-panel-3">
     <div class="map-wrapper">
-      <canvas id="routeCanvas3"></canvas>
+      <div id="amap-day3" class="amap-container"></div>
       <div class="map-controls">
         <div class="map-legend">
           <span class="leg-item"><span class="leg-line leg-line-solid" style="--c:#bf5af2"></span>BTS/Grab</span>
           <span class="leg-item"><span class="leg-line leg-line-solid" style="--c:#ffd60a"></span>🎤 演唱会</span>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <button class="open-btn" id="mapReplayBtn3">▶ 重新播放</button>
+          <button class="open-btn" id="mapReplayBtn3">📍 重置视图</button>
           <button class="fullscreen-btn" id="mapFullBtn3">⛶ 全屏</button>
         </div>
       </div>
@@ -954,7 +1004,7 @@
     <div class="day-card reveal reveal-delay-1" style="--card-accent:#0071e3">
       <div class="day-card-header">
         <span class="day-badge">Day 1</span>
-        <span class="day-name">5月7日 周三</span>
+        <span class="day-name">5月7日 周四</span>
       </div>
       <p class="day-desc">凌晨从广州出发，抵达曼谷，伦披尼公园 · Mahanakhon天空栈道 · 河畔夜市 · Rooftop Bar</p>
       <span class="day-total">2人约 ¥1,300</span>
@@ -962,7 +1012,7 @@
     <div class="day-card reveal reveal-delay-2" style="--card-accent:#30d158">
       <div class="day-card-header">
         <span class="day-badge" style="background:#30d158">Day 2</span>
-        <span class="day-name">5月8日 周四</span>
+        <span class="day-name">5月8日 周五</span>
       </div>
       <p class="day-desc">🏝️ 全天芭提雅珊瑚岛！白沙滩浮潜 · 芭提雅落日海滩 · 海鲜晚餐</p>
       <span class="day-total">2人约 ¥1,700</span>
@@ -970,7 +1020,7 @@
     <div class="day-card reveal reveal-delay-3" style="--card-accent:#bf5af2">
       <div class="day-card-header">
         <span class="day-badge" style="background:#bf5af2">Day 3</span>
-        <span class="day-name">5月9日 周五</span>
+        <span class="day-name">5月9日 周六</span>
       </div>
       <p class="day-desc">恰图恰市集 · 咖啡打卡 · 🎤 赵露思演唱会！全场应援</p>
       <span class="day-total">2人约 ¥700</span>
@@ -978,7 +1028,7 @@
     <div class="day-card reveal reveal-delay-4" style="--card-accent:#ffd60a">
       <div class="day-card-header">
         <span class="day-badge" style="background:#ffd60a;color:#000">Day 4</span>
-        <span class="day-name">5月10日 周六</span>
+        <span class="day-name">5月10日 周日</span>
       </div>
       <p class="day-desc">退房 · 买伴手礼 · 乘机返回广州 🛫</p>
       <span class="day-total" style="color:#ffd60a;background:rgba(255,214,10,0.1)">离境日</span>
@@ -1324,10 +1374,10 @@
       <p class="big-card-desc">广州白云（CAN）⇄ 曼谷廊曼（DMK）直飞无中转，全程约3.5小时。</p>
       <div style="margin-bottom:8px">
         <div class="price-badge">
-          <span class="price-num">¥698</span>
+          <span class="price-num">¥700</span>
           <span class="price-unit">/ 人（往返）</span>
         </div>
-        <p class="price-sub">含20kg 托运行李 + 7kg手提 · 2人合计 ¥1,396</p>
+        <p class="price-sub">含20kg 托运行李 + 7kg手提 · 2人合计 ¥1,400</p>
       </div>
       <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap">
         <span class="chip chip-blue">✈ 直飞 ~3.5小时</span>
@@ -1356,7 +1406,7 @@
               <div style="font-size:12px;color:var(--muted)">DMK 曼谷廊曼</div>
             </div>
           </div>
-          <div style="font-size:12px;color:var(--muted);text-align:center">5月7日（周三）· 经济舱 · 含行李</div>
+          <div style="font-size:12px;color:var(--muted);text-align:center">5月7日（周四）· 经济舱 · 含行李</div>
         </div>
       </div>
       <div class="kv-item" style="flex-direction:column;align-items:flex-start;gap:6px;padding-top:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">
@@ -1379,7 +1429,7 @@
               <div style="font-size:12px;color:var(--muted)">CAN 广州白云</div>
             </div>
           </div>
-          <div style="font-size:12px;color:var(--muted);text-align:center">5月10日（周六）· 经济舱 · 含行李 · 北京时间</div>
+          <div style="font-size:12px;color:var(--muted);text-align:center">5月10日（周日）· 经济舱 · 含行李 · 北京时间</div>
         </div>
       </div>
       <div class="kv-item" style="padding-top:12px">
@@ -1785,11 +1835,11 @@
 <section id="concert">
   <p class="section-label reveal">重头戏</p>
   <h2 class="section-title reveal">演唱会专项提示</h2>
-  <p class="section-desc reveal">Day 3 · 5月9日周五 · 赵露思 Bangkok 演唱会</p>
+  <p class="section-desc reveal">Day 3 · 5月9日周六 · 赵露思 Bangkok 演唱会</p>
 
   <div class="concert-hero reveal">
     <h2 class="concert-title">赵露思演唱会<br>Bangkok 2025 🎤</h2>
-    <p class="concert-date">5月9日 周五 · 19:30 起 · 曼谷演唱会场馆</p>
+    <p class="concert-date">5月9日 周六 · 19:30 起 · 曼谷演唱会场馆</p>
     <div class="checklist">
       <div class="check-item"><div class="check-box">□</div>演唱会票（截图 + PDF 双备份）</div>
       <div class="check-item"><div class="check-box">□</div>护照（部分场馆需验身份）</div>
@@ -1833,11 +1883,12 @@
 <footer>
   <p style="font-size:24px;margin-bottom:12px">🎤 🏝️ ✈️</p>
   <p><strong>祝旅途愉快，珊瑚岛尽兴，赵露思演唱会精彩！</strong></p>
-  <p style="margin-top:12px">本方案更新时间：2025年4月 · 价格仅供参考，以实际出行时为准</p>
+  <p style="margin-top:12px">本方案更新时间：2026年4月 · 价格仅供参考，以实际出行时为准</p>
   <p>政策可能变更，出发前请以官方最新信息为准</p>
 </footer>
 
 
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
 <script>
   // ── Scroll progress bar ──
   const progressBar = document.getElementById('progress-bar');
@@ -1997,330 +2048,130 @@
   })();
 
   // ══════════════════════════════════════
-  // 3-DAY ROUTE MAP SYSTEM
+  // LEAFLET + 高德地图 INTERACTIVE MAPS
   // ══════════════════════════════════════
   (function initRouteMaps() {
-    // Shared Thailand land polygon
-    const TH = [
-      [13.0,100.9],[12.5,101.5],[12.0,102.0],[11.5,102.5],[10.5,103.5],
-      [9.5,101.5],[8.5,100.5],[7.5,100.5],[7.0,100.5],[6.3,100.3],
-      [6.5,99.8],[7.0,99.5],[7.5,98.5],[8.5,98.2],[10.0,98.5],
-      [11.0,98.5],[12.0,98.5],[13.0,99.0],[14.0,98.4],[15.0,98.5],
-      [16.0,98.5],[17.0,98.2],[18.0,98.4],[19.5,98.9],[20.5,97.7],
-      [20.0,99.5],[18.5,101.0],[18.0,103.5],[17.5,104.5],[16.0,104.5],
-      [14.5,104.5],[13.5,103.5],[13.0,103.0],[12.5,102.5],[13.0,100.9]
-    ];
+    if (typeof L === 'undefined') return;
 
-    const DAYS_CFG = [
+    // 高德地图瓦片 (Gaode/Amap tile data source)
+    const AMAP_URL = 'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}';
+    const AMAP_OPTS = {
+      subdomains: ['1','2','3','4'],
+      maxZoom: 18,
+      attribution: '© <a href="https://amap.com" target="_blank" rel="noopener">高德地图</a>',
+    };
+
+    // Per-day configurations
+    const DAYS = [
       {
         id: 1,
-        bounds: [13.58, 14.06, 100.33, 100.87], // tight Bangkok view
         stops: [
-          { name:'廊曼机场', sub:'凌晨 抵达', lat:13.91, lon:100.61, col:'#0071e3' },
-          { name:'素坤逸酒店', sub:'行李寄存/入住', lat:13.74, lon:100.56, col:'#5ac8fa' },
-          { name:'伦披尼公园', sub:'10:00 晨间漫步', lat:13.73, lon:100.54, col:'#30d158' },
-          { name:'暹罗商圈', sub:'12:00 午餐逛街', lat:13.75, lon:100.53, col:'#30d158' },
-          { name:'Mahanakhon', sub:'16:00 天空栈道', lat:13.72, lon:100.52, col:'#bf5af2' },
-          { name:'Asiatique夜市', sub:'18:00 河畔夜景', lat:13.72, lon:100.50, col:'#ffd60a' },
-          { name:'Vertigo Bar', sub:'20:30 Rooftop', lat:13.72, lon:100.53, col:'#ff453a' },
+          { name:'廊曼机场 (DMK)',       sub:'凌晨 抵达',          lat:13.9126, lng:100.6069, col:'#0071e3' },
+          { name:'素坤逸酒店',           sub:'行李寄存 / 入住',     lat:13.7401, lng:100.5641, col:'#5ac8fa' },
+          { name:'伦披尼公园',           sub:'10:00 晨间漫步',      lat:13.7305, lng:100.5419, col:'#30d158' },
+          { name:'MBK 暹罗商圈',         sub:'12:00 午餐逛街',      lat:13.7453, lng:100.5297, col:'#30d158' },
+          { name:'Mahanakhon 天空栈道',  sub:'16:00 俯瞰曼谷',     lat:13.7215, lng:100.5226, col:'#bf5af2' },
+          { name:'Asiatique 河畔夜市',   sub:'18:00 湄南河夜景',    lat:13.7195, lng:100.5095, col:'#ffd60a' },
+          { name:'Vertigo Rooftop Bar',  sub:'20:30 360° 夜景',     lat:13.7219, lng:100.5316, col:'#ff453a' },
         ],
         segs: [
-          { f:0, t:1, type:'ground', col:'#5ac8fa' },
-          { f:1, t:2, type:'ground', col:'#30d158' },
-          { f:2, t:3, type:'ground', col:'#30d158' },
-          { f:3, t:4, type:'ground', col:'#bf5af2' },
-          { f:4, t:5, type:'ground', col:'#ffd60a' },
-          { f:5, t:6, type:'ground', col:'#ff453a' },
-          { f:6, t:1, type:'grab',   col:'#5ac8fa' },
+          { p:[0,1], col:'#5ac8fa', dash:'8 5' },
+          { p:[1,2], col:'#30d158' },
+          { p:[2,3], col:'#30d158' },
+          { p:[3,4], col:'#bf5af2' },
+          { p:[4,5], col:'#ffd60a' },
+          { p:[5,6], col:'#ff453a' },
+          { p:[6,1], col:'#5ac8fa', dash:'4 4' },
         ],
-        dur: [700, 500, 450, 450, 500, 400, 650],
       },
       {
         id: 2,
-        bounds: [12.68, 13.92, 100.25, 101.15], // Bangkok–Pattaya corridor
         stops: [
-          { name:'曼谷 Ekkamai', sub:'07:00 乘大巴出发', lat:13.72, lon:100.59, col:'#0071e3' },
-          { name:'芭提雅', sub:'09:00 抵达', lat:12.93, lon:100.88, col:'#30d158' },
-          { name:'珊瑚岛', sub:'10:00 浮潜游玩', lat:12.91, lon:100.77, col:'#5ac8fa' },
-          { name:'芭提雅海滩', sub:'16:00 落日散步', lat:12.94, lon:100.88, col:'#ffd60a' },
-          { name:'返回曼谷', sub:'18:30 大巴', lat:13.72, lon:100.59, col:'#0071e3' },
+          { name:'Ekkamai 巴士站',        sub:'07:00 乘大巴出发',    lat:13.7198, lng:100.5873, col:'#0071e3' },
+          { name:'芭提雅 Bali Hai 码头', sub:'09:00 抵达',           lat:12.9269, lng:100.8786, col:'#30d158' },
+          { name:'珊瑚岛 Koh Larn',       sub:'10:00 白沙滩 · 浮潜', lat:12.9091, lng:100.7741, col:'#5ac8fa' },
+          { name:'芭提雅海滩',            sub:'16:00 落日散步',       lat:12.9347, lng:100.8824, col:'#ffd60a' },
+          { name:'返回曼谷',              sub:'18:30 大巴',           lat:13.7198, lng:100.5873, col:'#0071e3' },
         ],
         segs: [
-          { f:0, t:1, type:'ground', col:'#30d158' },
-          { f:1, t:2, type:'boat',   col:'#5ac8fa' },
-          { f:2, t:3, type:'boat',   col:'#5ac8fa' },
-          { f:3, t:1, type:'ground', col:'#30d158' },
-          { f:1, t:4, type:'ground', col:'#30d158' },
+          { p:[0,1], col:'#30d158' },
+          { p:[1,2], col:'#5ac8fa', dash:'8 5' },
+          { p:[2,3], col:'#5ac8fa', dash:'8 5' },
+          { p:[3,1], col:'#30d158' },
+          { p:[1,4], col:'#30d158' },
         ],
-        dur: [1000, 550, 550, 450, 1000],
       },
       {
         id: 3,
-        bounds: [13.58, 14.06, 100.33, 100.87], // tight Bangkok view
         stops: [
-          { name:'素坤逸酒店', sub:'08:00 出发', lat:13.74, lon:100.56, col:'#30d158' },
-          { name:'恰图恰市集', sub:'10:00 逛市集', lat:13.80, lon:100.55, col:'#bf5af2' },
-          { name:'Or Tor Kor', sub:'12:30 午餐', lat:13.81, lon:100.55, col:'#5ac8fa' },
-          { name:'网红咖啡馆', sub:'13:30 下午茶', lat:13.74, lon:100.57, col:'#bf5af2' },
-          { name:'演唱会场馆', sub:'17:00 🎤 赵露思', lat:13.92, lon:100.56, col:'#bf5af2' },
-          { name:'返回酒店', sub:'演出结束', lat:13.74, lon:100.56, col:'#30d158' },
+          { name:'素坤逸酒店',          sub:'出发基地',                lat:13.7401, lng:100.5641, col:'#30d158' },
+          { name:'恰图恰市集',          sub:'10:00  5000+ 摊位',       lat:13.7999, lng:100.5501, col:'#bf5af2' },
+          { name:'Or Tor Kor Market',   sub:'12:30 高档农贸午餐',       lat:13.8032, lng:100.5523, col:'#5ac8fa' },
+          { name:'网红咖啡馆',          sub:'13:30 下午茶 + 应援物',    lat:13.7463, lng:100.5347, col:'#bf5af2' },
+          { name:'演唱会场馆',          sub:'17:00 🎤 赵露思演唱会',    lat:13.9260, lng:100.5571, col:'#ffd60a' },
+          { name:'返回酒店',            sub:'演出结束 BTS/Grab',        lat:13.7401, lng:100.5641, col:'#30d158' },
         ],
         segs: [
-          { f:0, t:1, type:'ground', col:'#bf5af2' },
-          { f:1, t:2, type:'ground', col:'#5ac8fa' },
-          { f:2, t:3, type:'grab',   col:'#bf5af2' },
-          { f:3, t:0, type:'ground', col:'#bf5af2' },
-          { f:0, t:4, type:'ground', col:'#bf5af2' },
-          { f:4, t:5, type:'grab',   col:'#ffd60a' },
+          { p:[0,1], col:'#bf5af2' },
+          { p:[1,2], col:'#5ac8fa' },
+          { p:[2,3], col:'#bf5af2', dash:'5 4' },
+          { p:[3,0], col:'#bf5af2' },
+          { p:[0,4], col:'#ffd60a', dash:'5 4' },
+          { p:[4,5], col:'#ffd60a', dash:'5 4' },
         ],
-        dur: [500, 300, 450, 400, 650, 550],
       },
     ];
 
-    function initDayMap(cfg) {
-      const { id, bounds, stops, segs, dur } = cfg;
-      const canvas = document.getElementById('routeCanvas' + id);
-      if (!canvas) return { start: () => {} };
-      const ctx = canvas.getContext('2d');
-      let W = 0, H = 0, dpr = 1, animId, startTs;
-      const [L0, L1, O0, O1] = bounds;
+    const leafletMaps = {};
+    const mapBounds = {};
 
-      function gp(lat, lon) {
-        return [(lon - O0) / (O1 - O0) * W, (1 - (lat - L0) / (L1 - L0)) * H];
-      }
+    function initMap(dayId) {
+      const el = document.getElementById('amap-day' + dayId);
+      if (!el || leafletMaps[dayId]) return;
+      const cfg = DAYS.find(d => d.id === dayId);
+      if (!cfg) return;
 
-      function setupCanvas() {
-        dpr = window.devicePixelRatio || 1;
-        if (!canvas.parentElement) return;
-        const cw = canvas.parentElement.clientWidth;
-        if (!cw) return;
-        H = Math.min(Math.round(cw * 0.56), 480);
-        W = cw;
-        canvas.width  = W * dpr;
-        canvas.height = H * dpr;
-        canvas.style.width  = W + 'px';
-        canvas.style.height = H + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
+      const lmap = L.map('amap-day' + dayId, { zoomControl: false, attributionControl: true });
+      L.control.zoom({ position: 'topright' }).addTo(lmap);
+      L.tileLayer(AMAP_URL, AMAP_OPTS).addTo(lmap);
 
-      function poly(pts, fill, stroke, lw) {
-        ctx.beginPath();
-        pts.forEach(([la, lo], i) => {
-          const [x, y] = gp(la, lo);
-          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      // Route polylines
+      cfg.segs.forEach(seg => {
+        const a = cfg.stops[seg.p[0]], b = cfg.stops[seg.p[1]];
+        L.polyline([[a.lat, a.lng], [b.lat, b.lng]], {
+          color: seg.col, weight: 3.5, opacity: 0.9,
+          dashArray: seg.dash || null,
+        }).addTo(lmap);
+      });
+
+      // Markers with tooltips
+      cfg.stops.forEach(stop => {
+        const icon = L.divIcon({
+          className: '',
+          html: `<div style="width:12px;height:12px;border-radius:50%;background:${stop.col};border:2px solid rgba(255,255,255,0.85);box-shadow:0 0 10px ${stop.col}88;"></div>`,
+          iconSize: [12, 12], iconAnchor: [6, 6],
         });
-        ctx.closePath();
-        if (fill)   { ctx.fillStyle = fill; ctx.fill(); }
-        if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 0.5; ctx.stroke(); }
-      }
+        L.marker([stop.lat, stop.lng], { icon })
+          .bindTooltip(`<strong style="color:${stop.col}">${stop.name}</strong><br><span style="color:#86868b;font-size:11px">${stop.sub}</span>`, {
+            permanent: false, direction: 'top', offset: [0, -8], className: 'map-tip',
+          })
+          .addTo(lmap);
+      });
 
-      function drawBg() {
-        const gr = ctx.createLinearGradient(0, 0, 0, H);
-        gr.addColorStop(0, '#04091a');
-        gr.addColorStop(1, '#071428');
-        ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H);
-
-        // Grid lines
-        ctx.strokeStyle = 'rgba(255,255,255,0.022)'; ctx.lineWidth = 0.5;
-        const latStep = (L1 - L0) > 1.5 ? 0.5 : 0.2;
-        const lonStep = (O1 - O0) > 1.0 ? 0.5 : 0.2;
-        for (let la = Math.ceil(L0 / latStep) * latStep; la <= L1; la += latStep) {
-          const [, y] = gp(la, O0);
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-        }
-        for (let lo = Math.ceil(O0 / lonStep) * lonStep; lo <= O1; lo += lonStep) {
-          const [x] = gp(L0, lo);
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-        }
-
-        // Land
-        poly(TH, '#1c2d40', '#2a3e5c', 0.7);
-
-        // City glow (Bangkok area)
-        const [bkx, bky] = gp(13.75, 100.52);
-        if (bkx > 0 && bkx < W && bky > 0 && bky < H) {
-          const cg = ctx.createRadialGradient(bkx, bky, 0, bkx, bky, W * 0.14);
-          cg.addColorStop(0, 'rgba(255,190,80,0.1)'); cg.addColorStop(1, 'rgba(255,190,80,0)');
-          ctx.fillStyle = cg;
-          ctx.beginPath(); ctx.arc(bkx, bky, W * 0.14, 0, Math.PI * 2); ctx.fill();
-        }
-
-        // Gulf label for Day 2
-        if (id === 2) {
-          const [gx, gy] = gp(12.82, 101.0);
-          const fs = Math.max(9, W / 115);
-          ctx.font = `italic ${fs}px Georgia, serif`;
-          ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(90,200,250,0.16)';
-          ctx.fillText('Gulf of Thailand', gx, gy);
-        }
-      }
-
-      function linePts(a, b, n = 22) {
-        const r = [];
-        for (let i = 0; i <= n; i++) {
-          const t = i / n;
-          r.push(gp(a.lat + (b.lat - a.lat) * t, a.lon + (b.lon - a.lon) * t));
-        }
-        return r;
-      }
-      function curvePts(a, b, n = 40) {
-        const r = [];
-        const dlat = b.lat - a.lat, dlon = b.lon - a.lon;
-        const dist = Math.sqrt(dlat * dlat + dlon * dlon);
-        for (let i = 0; i <= n; i++) {
-          const t = i / n;
-          const bow = Math.sin(t * Math.PI) * dist * 0.12 * (dlon >= 0 ? -1 : 1);
-          r.push(gp(a.lat + dlat * t + bow * 0.4, a.lon + dlon * t + bow));
-        }
-        return r;
-      }
-
-      let SPTS = [];
-      function buildPts() {
-        SPTS = segs.map(s => {
-          const a = stops[s.f], b = stops[s.t];
-          return s.type === 'boat' ? curvePts(a, b) : linePts(a, b);
-        });
-      }
-
-      // Timing
-      const BG_END = 450, STOP_DLY = 140;
-      const STOP_END = BG_END + stops.length * STOP_DLY;
-      const SEG_START = [];
-      let tAcc = STOP_END + 360;
-      for (let i = 0; i < segs.length; i++) { SEG_START.push(tAcc); tAcc += dur[i] + 260; }
-      const TOTAL = tAcc + 900;
-
-      function rrect(x, y, w, h, r) {
-        ctx.beginPath();
-        ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
-        ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-        ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
-        ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
-        ctx.closePath();
-      }
-
-      function drawMarker(s, alpha, pulse) {
-        if (alpha <= 0) return;
-        const [x, y] = gp(s.lat, s.lon);
-        const r = Math.max(5, W / 110);
-
-        if (pulse > 0) {
-          const pg = ctx.createRadialGradient(x, y, r, x, y, r * 4.5 + pulse * 8);
-          pg.addColorStop(0, s.col + '66'); pg.addColorStop(1, s.col + '00');
-          ctx.globalAlpha = alpha * 0.9;
-          ctx.beginPath(); ctx.arc(x, y, r * 4.5 + pulse * 8, 0, Math.PI * 2);
-          ctx.fillStyle = pg; ctx.fill();
-        }
-        ctx.globalAlpha = alpha * 0.22;
-        ctx.beginPath(); ctx.arc(x, y, r * 2.4, 0, Math.PI * 2);
-        ctx.fillStyle = s.col; ctx.fill();
-        ctx.globalAlpha = alpha;
-        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fillStyle = s.col; ctx.fill();
-        ctx.globalAlpha = 1;
-
-        const fs = Math.max(9, W / 95);
-        ctx.font = `700 ${fs}px -apple-system,'Helvetica Neue',sans-serif`;
-        const right = x > W * 0.62;
-        ctx.textAlign = right ? 'right' : 'left';
-        const lx = right ? x - r * 3.2 : x + r * 3.2;
-        const tw1 = ctx.measureText(s.name).width;
-        ctx.font = `${fs * 0.8}px -apple-system,'Helvetica Neue',sans-serif`;
-        const tw2 = ctx.measureText(s.sub).width;
-        const mw = Math.max(tw1, tw2) + 14; const mh = fs * 2.9;
-        const bx = right ? lx - mw : lx - 5; const by = y - mh / 2;
-
-        ctx.globalAlpha = alpha * 0.9;
-        ctx.fillStyle = 'rgba(3,7,20,0.93)';
-        rrect(bx, by, mw, mh, 5); ctx.fill();
-        ctx.strokeStyle = s.col + '50'; ctx.lineWidth = 1;
-        rrect(bx, by, mw, mh, 5); ctx.stroke();
-
-        ctx.globalAlpha = alpha;
-        ctx.font = `700 ${fs}px -apple-system,'Helvetica Neue',sans-serif`;
-        ctx.fillStyle = '#f5f5f7'; ctx.fillText(s.name, lx, y - fs * 0.05);
-        ctx.font = `${fs * 0.8}px -apple-system,'Helvetica Neue',sans-serif`;
-        ctx.fillStyle = '#86868b'; ctx.fillText(s.sub, lx, y + fs * 1.08);
-        ctx.globalAlpha = 1;
-      }
-
-      function drawSeg(seg, pts, prog, done) {
-        if (!pts || pts.length < 2) return;
-        const n = Math.max(2, Math.floor(prog * pts.length));
-        ctx.save();
-        ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-        ctx.strokeStyle = seg.col; ctx.globalAlpha = 0.88;
-        ctx.setLineDash(seg.type === 'boat' ? [5, 4] : seg.type === 'grab' ? [3, 3] : []);
-        ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
-        for (let i = 1; i < n; i++) ctx.lineTo(pts[i][0], pts[i][1]);
-        ctx.stroke(); ctx.setLineDash([]);
-        if (!done && n < pts.length) {
-          const [hx, hy] = pts[n - 1];
-          ctx.globalAlpha = 1;
-          ctx.beginPath(); ctx.arc(hx, hy, 5, 0, Math.PI * 2);
-          ctx.fillStyle = seg.col; ctx.fill();
-          const gg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 13);
-          gg.addColorStop(0, seg.col + '77'); gg.addColorStop(1, seg.col + '00');
-          ctx.beginPath(); ctx.arc(hx, hy, 13, 0, Math.PI * 2);
-          ctx.fillStyle = gg; ctx.fill();
-        }
-        ctx.restore();
-      }
-
-      function frame(ts) {
-        if (!startTs) startTs = ts;
-        const el = ts - startTs;
-        ctx.clearRect(0, 0, W, H);
-        const bgA = Math.min(1, el / BG_END);
-        ctx.globalAlpha = bgA; drawBg(); ctx.globalAlpha = 1;
-
-        for (let i = 0; i < stops.length; i++) {
-          const sT = BG_END + i * STOP_DLY;
-          const a = Math.min(1, Math.max(0, (el - sT) / 320));
-          const pulse = (i === 0 && el > sT && el < SEG_START[0] + 500) ? Math.sin(el / 400) * 0.5 + 0.5 : 0;
-          drawMarker(stops[i], a, pulse);
-        }
-        for (let si = 0; si < segs.length; si++) {
-          if (el < SEG_START[si]) break;
-          const prog = Math.min(1, (el - SEG_START[si]) / dur[si]);
-          drawSeg(segs[si], SPTS[si], prog, prog >= 1);
-        }
-
-        if (el < TOTAL) {
-          animId = requestAnimationFrame(frame);
-        } else {
-          ctx.clearRect(0, 0, W, H); drawBg();
-          segs.forEach((seg, si) => drawSeg(seg, SPTS[si], 1, true));
-          stops.forEach(s => drawMarker(s, 1, 0));
-        }
-      }
-
-      function start() {
-        cancelAnimationFrame(animId); startTs = null;
-        setupCanvas(); buildPts();
-        if (W > 0) animId = requestAnimationFrame(frame);
-      }
-
-      window.addEventListener('resize', () => {
-        const panel = document.getElementById('map-panel-' + id);
-        if (panel && panel.classList.contains('active')) start();
-      }, { passive: true });
-
-      return { start };
+      const bounds = L.latLngBounds(cfg.stops.map(s => [s.lat, s.lng]));
+      lmap.fitBounds(bounds, { padding: [45, 45] });
+      mapBounds[dayId] = bounds;
+      leafletMaps[dayId] = lmap;
     }
 
-    // Build all day maps
-    const dayMaps = DAYS_CFG.map(cfg => ({ id: cfg.id, ctrl: initDayMap(cfg) }));
-    const mapPlayed = { 1: false, 2: false, 3: false };
-
-    // Auto-start Day 1 when section scrolls into view
+    // Initialize Day 1 when section scrolls into view
     const routemapSection = document.getElementById('routemap');
+    let day1Inited = false;
     if (routemapSection) {
       const io = new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting && !mapPlayed[1]) {
-          mapPlayed[1] = true;
-          setTimeout(() => dayMaps.find(m => m.id === 1).ctrl.start(), 300);
+        if (entries[0].isIntersecting && !day1Inited) {
+          day1Inited = true;
+          setTimeout(() => initMap(1), 300);
         }
       }, { threshold: 0.1 });
       io.observe(routemapSection);
@@ -2336,22 +2187,25 @@
         const panel = document.getElementById('map-panel-' + day);
         if (panel) {
           panel.classList.add('active');
-          if (!mapPlayed[day]) {
-            mapPlayed[day] = true;
-            const map = dayMaps.find(m => m.id === day);
-            if (map) setTimeout(() => map.ctrl.start(), 60);
+          if (!leafletMaps[day]) {
+            setTimeout(() => initMap(day), 80);
+          } else {
+            setTimeout(() => {
+              leafletMaps[day].invalidateSize();
+              leafletMaps[day].fitBounds(mapBounds[day], { padding: [45, 45] });
+            }, 80);
           }
         }
       });
     });
 
-    // Replay buttons
+    // Reset-view buttons
     [1, 2, 3].forEach(day => {
       const btn = document.getElementById('mapReplayBtn' + day);
       if (btn) btn.addEventListener('click', () => {
-        mapPlayed[day] = true;
-        const map = dayMaps.find(m => m.id === day);
-        if (map) map.ctrl.start();
+        if (leafletMaps[day] && mapBounds[day]) {
+          leafletMaps[day].fitBounds(mapBounds[day], { padding: [45, 45], animate: true, duration: 0.6 });
+        }
       });
     });
 
@@ -2370,16 +2224,15 @@
       });
     });
 
-    // Redraw at full size when entering/exiting fullscreen
+    // Invalidate Leaflet size on fullscreen toggle or window resize
     document.addEventListener('fullscreenchange', () => {
       [1, 2, 3].forEach(day => {
-        const panel = document.getElementById('map-panel-' + day);
-        if (panel && panel.classList.contains('active')) {
-          const map = dayMaps.find(m => m.id === day);
-          if (map) setTimeout(() => map.ctrl.start(), 120);
-        }
+        if (leafletMaps[day]) setTimeout(() => leafletMaps[day].invalidateSize(), 120);
       });
     });
+    window.addEventListener('resize', () => {
+      [1, 2, 3].forEach(day => { if (leafletMaps[day]) leafletMaps[day].invalidateSize(); });
+    }, { passive: true });
   })();
 </script>
 </body>
