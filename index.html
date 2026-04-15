@@ -880,8 +880,8 @@
   <p class="section-desc reveal">点击切换每天行程，动画演示在泰完整轨迹；支持全屏沉浸查看。</p>
 
   <div class="map-tabs reveal">
-    <button class="map-tab active" data-day="1">✈️ Day 1 · 抵达 &amp; 曼谷</button>
-    <button class="map-tab" data-day="2">🏝️ Day 2 · 芭提雅 &amp; 珊瑚岛</button>
+    <button class="map-tab active" data-day="1">✈️ Day 1 · 抵达 & 曼谷</button>
+    <button class="map-tab" data-day="2">🏝️ Day 2 · 芭提雅 & 珊瑚岛</button>
     <button class="map-tab" data-day="3">🎤 Day 3 · 演唱会日</button>
   </div>
 
@@ -1327,7 +1327,7 @@
           <span class="price-num">¥698</span>
           <span class="price-unit">/ 人（往返）</span>
         </div>
-        <p class="price-sub">含20kg 托运行李 + 7kg手提 · 2人合计约 ¥1,396</p>
+        <p class="price-sub">含20kg 托运行李 + 7kg手提 · 2人合计 ¥1,396</p>
       </div>
       <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap">
         <span class="chip chip-blue">✈ 直飞 ~3.5小时</span>
@@ -2091,7 +2091,8 @@
 
       function setupCanvas() {
         dpr = window.devicePixelRatio || 1;
-        const cw = canvas.parentElement ? canvas.parentElement.clientWidth : 0;
+        if (!canvas.parentElement) return;
+        const cw = canvas.parentElement.clientWidth;
         if (!cw) return;
         H = Math.min(Math.round(cw * 0.56), 480);
         W = cw;
@@ -2355,6 +2356,7 @@
     });
 
     // Fullscreen buttons
+    const noop = () => {};
     [1, 2, 3].forEach(day => {
       const btn = document.getElementById('mapFullBtn' + day);
       if (btn) btn.addEventListener('click', () => {
@@ -2363,7 +2365,7 @@
         if (document.fullscreenElement) {
           document.exitFullscreen();
         } else {
-          (panel.requestFullscreen || panel.webkitRequestFullscreen || panel.mozRequestFullScreen || (() => {})).call(panel);
+          (panel.requestFullscreen || panel.webkitRequestFullscreen || panel.mozRequestFullScreen || noop).call(panel);
         }
       });
     });
